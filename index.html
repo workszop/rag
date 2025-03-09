@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tech Support RAG System Simulator</title>
+  <!-- Include Tailwind CSS from CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Include Lucide Icons for the icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/lucide.min.js"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="flex flex-col space-y-8 p-6 max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold text-center">Tech Support RAG System Simulator</h1>
+    
+    <!-- Query Input -->
+    <div class="w-full p-4 bg-gray-50 rounded-lg">
+      <label for="queryInput" class="block text-sm font-medium mb-2">Customer Support Query:</label>
+      <div class="flex space-x-2">
+        <input id="queryInput" type="text" value="How do I reset my TechX Pro 13 laptop if it freezes?" class="flex-1 p-2 border rounded" placeholder="Type your support question here...">
+        <button id="runSimulationButton" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Run Simulation</button>
+        <button id="nextStepButton" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Next Step</button>
+      </div>
+    </div>
+
+    <!-- Documents Visual Representation Accordion -->
+    <div class="bg-white p-4 rounded-lg shadow-lg">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold">Documents Visual Representation</h2>
+        <div class="space-x-2">
+          <button id="embedDocumentsButton" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+            Embed Documents
+          </button>
+          <button id="toggleAccordionButton" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+            Toggle Documents
+          </button>
+        </div>
+      </div>
+      <div id="docVisualContainer" class="mt-4 grid grid-cols-1 gap-4">
+        <div class="text-gray-500 italic">Documents have not been embedded yet.</div>
+      </div>
+    </div>
+    
+    <!-- RAG Flow Visualization -->
+    <div class="w-full bg-white rounded-lg shadow-lg p-6">
+      <div class="flex flex-col items-center space-y-6">
+        <!-- Document Store (Indexing Documents) -->
+        <div class="flex items-center justify-center w-full">
+          <div id="documentStoreBox" class="relative p-4 border-2 rounded-lg w-60 border-gray-300">
+            <div class="absolute -top-3 left-2 bg-white px-2 font-medium text-sm">
+              Knowledge Base (Pre-indexed)
+            </div>
+            <div class="flex items-center space-x-2 mb-2">
+              <i data-lucide="database" class="text-blue-600"></i>
+              <span class="font-bold">Technical Support Docs</span>
+            </div>
+            <div id="documentStoreContent" class="text-xs h-32 overflow-y-auto">
+              <!-- Document list will be rendered here -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Query Phase Components -->
+        <div class="flex items-start justify-between w-full space-x-4">
+          <!-- Customer Query -->
+          <div id="customerQueryBox" class="p-4 border-2 rounded-lg w-60 border-gray-300">
+            <div class="flex items-center space-x-2 mb-2">
+              <i data-lucide="file-text" class="text-blue-600"></i>
+              <span class="font-bold">Customer Query</span>
+            </div>
+            <div id="customerQueryContent" class="text-sm p-2 border rounded bg-gray-50 h-28 overflow-y-auto"></div>
+            <div class="mt-2 text-xs text-gray-600">
+              Step 1: Customer submits support question
+            </div>
+          </div>
+          
+          <div class="flex items-center">
+            <i data-lucide="arrow-right" class="text-gray-500"></i>
+          </div>
+          
+          <!-- Embedding Model (Query Vector) -->
+          <div id="embeddingModelBox" class="p-4 border-2 rounded-lg w-60 border-gray-300">
+            <div class="flex items-center space-x-2 mb-2">
+              <i data-lucide="cpu" class="text-purple-600"></i>
+              <span class="font-bold">Embedding Model</span>
+            </div>
+            <div class="text-sm">
+              <div class="mb-2">Query Vector:</div>
+              <div id="embeddingModelContent" class="p-2 bg-gray-50 rounded text-xs italic h-28">
+                Waiting for query to process...
+              </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-600">
+              Step 2: Convert query to semantic vector
+            </div>
+          </div>
+          
+          <div class="flex items-center">
+            <i data-lucide="arrow-right" class="text-gray-500"></i>
+          </div>
+          
+          <!-- Retriever -->
+          <div id="retrieverBox" class="p-4 border-2 rounded-lg w-60 border-gray-300">
+            <div class="flex items-center space-x-2 mb-2">
+              <i data-lucide="search" class="text-green-600"></i>
+              <span class="font-bold">Retriever</span>
+            </div>
+            <div class="text-sm">
+              <div class="mb-1">Retrieved Documents:</div>
+              <div id="retrieverContent" class="h-28 overflow-y-auto">
+                <div class="p-2 bg-gray-50 rounded text-xs italic">
+                  Waiting for embedding...
+                </div>
+              </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-600">
+              Step 3: Find relevant support documents
+            </div>
+          </div>
+          
+          <div class="flex items-center">
+            <i data-lucide="arrow-right" class="text-gray-500"></i>
+          </div>
+          
+          <!-- Response Generator -->
+          <div id="responseGeneratorBox" class="p-4 border-2 rounded-lg w-60 border-gray-300">
+            <div class="flex items-center space-x-2 mb-2">
+              <i data-lucide="message-square" class="text-red-600"></i>
+              <span class="font-bold">Response Generator</span>
+            </div>
+            <div id="responseGeneratorContent" class="text-sm h-28 overflow-y-auto">
+              <div class="p-2 bg-gray-50 rounded text-xs italic">
+                Waiting for retrieval...
+              </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-600">
+              Step 4: Generate helpful support response
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Process Explanation -->
+    <div class="bg-gray-50 p-4 rounded-lg">
+      <h2 class="font-bold mb-2">How This Tech Support RAG System Works:</h2>
+      <ol class="list-decimal list-inside space-y-2 text-sm">
+        <li><span class="font-medium">Document Indexing:</span> The system embeds the support documents using a vectoriser (the same one used for user queries) and stores them in a vector database.</li>
+        <li><span class="font-medium">Query Understanding:</span> The customer's support question is converted into a semantic vector.</li>
+        <li><span class="font-medium">Relevant Document Retrieval:</span> The system finds the most contextually similar documents using vector similarity.</li>
+        <li><span class="font-medium">Response Generation:</span> An AI combines the retrieved technical information with the customer's question to generate a helpful, specific response.</li>
+      </ol>
+      <div class="mt-4 text-sm text-gray-600">
+        <p>Note: If the question is irrelevant (for example, a weather question), the system will indicate that it has no documents to answer it.</p>
+      </div>
+    </div>
+    
+    <!-- Try Different Queries -->
+    <div class="bg-white p-4 rounded-lg border">
+      <h3 class="font-bold mb-2">Try These Sample Support Queries:</h3>
+      <div class="flex flex-wrap gap-2">
+        <button 
+          class="sampleQuery px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded"
+          data-query="How do I reset my TechX Pro 13 laptop if it freezes?">
+          How do I reset my TechX Pro 13 laptop if it freezes?
+        </button>
+        <button 
+          class="sampleQuery px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded"
+          data-query="How do I connect my SoundWave X300 headphones to my phone?">
+          How do I connect my SoundWave X300 headphones to my phone?
+        </button>
+        <button 
+          class="sampleQuery px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded"
+          data-query="How can I mirror my laptop screen to my SmartView 4K TV?">
+          How can I mirror my laptop screen to my SmartView 4K TV?
+        </button>
+        <button 
+          class="sampleQuery px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded"
+          data-query="What is the weather today?">
+          What is the weather today?
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- JavaScript -->
+  <script>
+    // Global state variables and simulation steps:
+    // Step 0: Document Indexing, Step 1: Customer Query, Step 2: Query Embedding,
+    // Step 3: Document Retrieval, Step 4: Response Generation, Step 5: Reset.
+    let currentStep = 0;
+    let isRunning = false;
+    let query = document.getElementById('queryInput').value;
+    let queryEmbedding = null;
+    let retrievedDocs = [];
+    let generatedResponse = '';
+    let indexedDocuments = [];
+    
+    // Tech support documents (pre-defined)
+    const documents = [
+      { 
+        id: 1, 
+        title: "TechX Pro 13 - Troubleshooting Frozen System",
+        text: "If your TechX Pro 13 laptop freezes or becomes unresponsive, press and hold the power button for 10 seconds to force a shutdown. Wait 30 seconds before restarting. If the issue persists, try resetting the SMC by holding Shift+Control+Option and the power button simultaneously for 10 seconds.", 
+        product: "laptop",
+        category: "troubleshooting",
+        embedding: [0.9, 0.2, 0.3, 0.1] 
+      },
+      { 
+        id: 2, 
+        title: "TechX Pro 13 - Battery Optimization",
+        text: "To maximize your TechX Pro 13 battery life, adjust your display brightness, close unused applications, and disable background processes. For best results, enable Battery Saver mode when below 20% charge. The battery is rated for 1000 charge cycles before degradation begins.", 
+        product: "laptop",
+        category: "maintenance",
+        embedding: [0.7, 0.3, 0.1, 0.2] 
+      },
+      { 
+        id: 3, 
+        title: "SoundWave X300 Headphones - Pairing Instructions",
+        text: "To pair your SoundWave X300 headphones with a new device, press and hold the multifunction button for 5 seconds until the LED flashes blue and red alternately. Enable Bluetooth on your device and select 'SoundWave X300' from the list of available devices. The LED will turn solid blue when successfully connected.", 
+        product: "headphones",
+        category: "setup",
+        embedding: [0.1, 0.8, 0.2, 0.4] 
+      },
+      { 
+        id: 4, 
+        title: "SoundWave X300 Headphones - Factory Reset",
+        text: "To perform a factory reset on your SoundWave X300 headphones, press and hold both volume buttons simultaneously for 10 seconds while the headphones are powered on. The LED will flash purple three times to confirm the reset. Note that this will remove all paired devices from memory.", 
+        product: "headphones",
+        category: "troubleshooting",
+        embedding: [0.2, 0.7, 0.3, 0.5] 
+      },
+      { 
+        id: 5, 
+        title: "PixelPlus Ultra - Camera Settings",
+        text: "The PixelPlus Ultra smartphone features a 108MP main camera with Night Mode capabilities. For best results in low light, enable Night Mode and keep the phone steady for 2-3 seconds during capture. Pro Mode allows manual adjustment of ISO (50-3200), shutter speed (1/5000-30s), and focus.", 
+        product: "smartphone",
+        category: "features",
+        embedding: [0.3, 0.4, 0.8, 0.1] 
+      },
+      { 
+        id: 6, 
+        title: "PixelPlus Ultra - Storage Management",
+        text: "When your PixelPlus Ultra storage is full, go to Settings > Storage to analyze space usage. Use the built-in Storage Manager to remove temporary files and cached data. You can also enable Cloud Backup to automatically offload photos and videos to your cloud account when storage drops below 15%.", 
+        product: "smartphone",
+        category: "maintenance",
+        embedding: [0.4, 0.5, 0.7, 0.2] 
+      },
+      { 
+        id: 7, 
+        title: "SmartView 4K - Screen Mirroring Setup",
+        text: "To mirror your device to the SmartView 4K TV, ensure both devices are on the same WiFi network. On your smartphone or laptop, open the screen mirroring function (called AirPlay on Apple devices, SmartView on Android). Select your TV from the list of available devices. For PC users, press Windows+K to open the casting menu.", 
+        product: "tv",
+        category: "setup",
+        embedding: [0.5, 0.3, 0.1, 0.8] 
+      },
+      { 
+        id: 8, 
+        title: "SmartView 4K - Sound Issues Troubleshooting",
+        text: "If you experience no sound or audio distortion on your SmartView 4K TV, first check if the mute function is active or volume is too low. Ensure external speakers are properly connected if applicable. For HDMI device audio issues, verify the HDMI-ARC setting is enabled in Sound Settings. A full restart of the TV can resolve most temporary audio glitches.", 
+        product: "tv",
+        category: "troubleshooting",
+        embedding: [0.6, 0.4, 0.2, 0.7] 
+      },
+    ];
+    
+    // Explicitly index (embed) documents using the same vectoriser as the query
+    function indexDocuments() {
+      indexedDocuments = documents.map(doc => {
+        const newEmbedding = embedQuery(doc.text);
+        return { ...doc, embedding: newEmbedding };
+      });
+      updateDocumentStore();
+      updateDocVisual();
+    }
+    
+    // Update the Knowledge Base box in the simulation flow
+    function updateDocumentStore() {
+      const container = document.getElementById('documentStoreContent');
+      container.innerHTML = '';
+      indexedDocuments.forEach(doc => {
+        const div = document.createElement('div');
+        div.className = "mb-2 p-1 bg-gray-100 rounded flex flex-col";
+        div.innerHTML = 
+          '<div class="flex items-center space-x-1">' +
+            getProductIcon(doc.product) +
+            '<div class="font-medium text-xs truncate">' + doc.title + '</div>' +
+          '</div>' +
+          '<div class="text-[10px] text-gray-500">[' + doc.embedding.map(v => v.toFixed(3)).join(', ') + ']</div>';
+        container.appendChild(div);
+      });
+    }
+    
+    // Update the Documents Visual Representation container (accordion)
+    function updateDocVisual() {
+      const container = document.getElementById('docVisualContainer');
+      container.innerHTML = '';
+      if (indexedDocuments.length === 0) {
+        container.innerHTML = '<div class="text-gray-500 italic">Documents have not been embedded yet.</div>';
+        return;
+      }
+      indexedDocuments.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = "p-4 border rounded-lg bg-gray-50";
+        card.innerHTML = `
+          <div class="flex items-center space-x-2">
+            ${getProductIcon(doc.product)}
+            <span class="font-bold text-sm">${doc.title}</span>
+          </div>
+          <div class="mt-1 text-xs text-gray-600">Vector: [${doc.embedding.map(v => v.toFixed(3)).join(', ')}]</div>
+          <div class="mt-1 text-xs text-gray-500">${doc.text}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    // Get a product icon (using Lucide) based on product type
+    function getProductIcon(product) {
+      let iconName = '';
+      switch(product) {
+        case 'laptop': iconName = 'laptop'; break;
+        case 'headphones': iconName = 'headphones'; break;
+        case 'smartphone': iconName = 'smartphone'; break;
+        case 'tv': iconName = 'monitor'; break;
+        default: iconName = 'file-text';
+      }
+      return '<i data-lucide="'+iconName+'" class="h-4 w-4"></i>';
+    }
+    
+    // Simulate embedding the query text into a vector
+    function embedQuery(text) {
+      let embedding = [0.5, 0.5, 0.5, 0.5];
+      const textLower = text.toLowerCase();
+      if (textLower.includes('laptop') || textLower.includes('techx')) {
+        embedding[0] += 0.4;
+      }
+      if (textLower.includes('headphone') || textLower.includes('soundwave')) {
+        embedding[1] += 0.4;
+      }
+      if (textLower.includes('phone') || textLower.includes('pixelplus')) {
+        embedding[2] += 0.4;
+      }
+      if (textLower.includes('tv') || textLower.includes('smartview')) {
+        embedding[3] += 0.4;
+      }
+      if (textLower.includes('reset') || textLower.includes('restart') || textLower.includes('freeze')) {
+        embedding[0] += 0.2;
+        embedding[1] += 0.1;
+      }
+      if (textLower.includes('pair') || textLower.includes('connect') || textLower.includes('bluetooth')) {
+        embedding[1] += 0.3;
+      }
+      if (textLower.includes('camera') || textLower.includes('photo')) {
+        embedding[2] += 0.3;
+      }
+      if (textLower.includes('screen') || textLower.includes('display') || textLower.includes('audio')) {
+        embedding[3] += 0.2;
+      }
+      const sum = embedding.reduce((a, b) => a + b, 0);
+      return embedding.map(v => v / sum);
+    }
+    
+    // Find the most similar documents using cosine similarity
+    function findSimilarDocuments(queryVector, docs, topK = 3) {
+      function calculateSimilarity(v1, v2) {
+        let dotProduct = 0, mag1 = 0, mag2 = 0;
+        for (let i = 0; i < v1.length; i++) {
+          dotProduct += v1[i] * v2[i];
+          mag1 += v1[i] * v1[i];
+          mag2 += v2[i] * v2[i];
+        }
+        mag1 = Math.sqrt(mag1);
+        mag2 = Math.sqrt(mag2);
+        return dotProduct / (mag1 * mag2);
+      }
+      return docs
+        .map(doc => ({ ...doc, similarity: calculateSimilarity(queryVector, doc.embedding) }))
+        .sort((a, b) => b.similarity - a.similarity)
+        .slice(0, topK);
+    }
+    
+    // Generate a response based on retrieved documents and the query.
+    // If the query contains "weather", answer that no weather information is available.
+    function generateResponse(retrievedDocs, userQuery) {
+      const queryLower = userQuery.toLowerCase();
+      if(queryLower.includes("weather")){
+        return "There is no information about weather in provided documents.";
+      }
+      
+      if (retrievedDocs.length === 0 || (retrievedDocs[0] && retrievedDocs[0].similarity < 0.2)) {
+        return "I don't have enough information to answer your question. Could you provide more details about the product you're having issues with?";
+      }
+      
+      // Laptop freezing issue
+      if ((queryLower.includes('laptop') || queryLower.includes('techx')) &&
+          (queryLower.includes('freeze') || queryLower.includes('frozen') || queryLower.includes('restart') || queryLower.includes('reset'))) {
+        if (retrievedDocs.some(doc => doc.id === 1)) {
+          return "If your TechX Pro 13 laptop is frozen or unresponsive, you should:\n\n1. Press and hold the power button for 10 seconds to force a shutdown\n2. Wait at least 30 seconds before turning it back on\n3. If this doesn't resolve the issue, try resetting the SMC by holding Shift+Control+Option and the power button simultaneously for 10 seconds\n\nIf the problem persists, it might indicate a more serious hardware issue requiring service.";
+        }
+      }
+      
+      // Headphone pairing issue
+      if ((queryLower.includes('headphone') || queryLower.includes('soundwave')) &&
+          (queryLower.includes('pair') || queryLower.includes('connect') || queryLower.includes('bluetooth'))) {
+        if (retrievedDocs.some(doc => doc.id === 3)) {
+          return "To pair your SoundWave X300 headphones with a new device:\n\n1. Press and hold the multifunction button for 5 seconds until the LED flashes blue and red alternately\n2. Enable Bluetooth on your device\n3. Select 'SoundWave X300' from the list of available devices\n4. The LED will turn solid blue when successfully connected\n\nIf you're having trouble connecting, try resetting your headphones by holding both volume buttons for 10 seconds.";
+        }
+      }
+      
+      // TV mirroring
+      if ((queryLower.includes('tv') || queryLower.includes('smartview')) &&
+          (queryLower.includes('mirror') || queryLower.includes('cast') || queryLower.includes('screen'))) {
+        if (retrievedDocs.some(doc => doc.id === 7)) {
+          return "To mirror your screen to a SmartView 4K TV:\n\n1. Make sure both your device and TV are connected to the same WiFi network\n2. On your device, open the screen mirroring function (AirPlay on Apple, SmartView on Android)\n3. Select your TV from the list of available devices\n4. For Windows PC, press Windows+K to open the casting menu\n\nIf you're having connection issues, try restarting both your device and TV.";
+        }
+      }
+      
+      // Default: Combine information from retrieved documents.
+      let response = "Based on the information I have:";
+      retrievedDocs.forEach(doc => {
+        response += "\n\n" + doc.title + ":\n" + doc.text;
+      });
+      
+      return response;
+    }
+    
+    // Update the UI based on the current simulation step
+    function updateUI() {
+      // Update customer query text
+      document.getElementById('customerQueryContent').innerText = query;
+      
+      // Update embedding model box
+      if (queryEmbedding) {
+        document.getElementById('embeddingModelContent').innerText = "[" + queryEmbedding.map(v => v.toFixed(3)).join(', ') + "]";
+      } else {
+        document.getElementById('embeddingModelContent').innerHTML = '<span class="italic">Waiting for query to process...</span>';
+      }
+      
+      // Update retriever box
+      const retrieverEl = document.getElementById('retrieverContent');
+      retrieverEl.innerHTML = '';
+      if (retrievedDocs.length > 0) {
+        retrievedDocs.forEach(doc => {
+          const div = document.createElement('div');
+          div.className = "mb-2 p-2 bg-green-50 rounded text-xs";
+          div.innerHTML = '<div class="font-medium flex items-center gap-1">' + 
+            getProductIcon(doc.product) + 
+            '<span>Doc ' + doc.id + ' (' + (doc.similarity * 100).toFixed(1) + '%)</span></div>' +
+            '<div class="text-xs truncate">' + doc.title + '</div>';
+          retrieverEl.appendChild(div);
+        });
+      } else {
+        retrieverEl.innerHTML = '<div class="p-2 bg-gray-50 rounded text-xs italic">Waiting for embedding...</div>';
+      }
+      
+      // Update response generator box
+      const responseEl = document.getElementById('responseGeneratorContent');
+      if (generatedResponse) {
+        responseEl.innerHTML = '<div class="p-2 bg-red-50 rounded text-xs whitespace-pre-wrap">' + generatedResponse + '</div>';
+      } else {
+        responseEl.innerHTML = '<div class="p-2 bg-gray-50 rounded text-xs italic">Waiting for retrieval...</div>';
+      }
+      
+      // Highlight the active step box:
+      // Step 0: Document Indexing, Step 1: Customer Query, Step 2: Query Embedding,
+      // Step 3: Document Retrieval, Step 4: Response Generation.
+      document.getElementById('documentStoreBox').className = "relative p-4 border-2 rounded-lg w-60 " + (currentStep === 0 ? "border-blue-500 bg-blue-50" : "border-gray-300");
+      document.getElementById('customerQueryBox').className = "p-4 border-2 rounded-lg w-60 " + (currentStep === 1 ? "border-blue-500 bg-blue-50" : "border-gray-300");
+      document.getElementById('embeddingModelBox').className = "p-4 border-2 rounded-lg w-60 " + (currentStep === 2 ? "border-blue-500 bg-blue-50" : "border-gray-300");
+      document.getElementById('retrieverBox').className = "p-4 border-2 rounded-lg w-60 " + (currentStep === 3 ? "border-blue-500 bg-blue-50" : "border-gray-300");
+      document.getElementById('responseGeneratorBox').className = "p-4 border-2 rounded-lg w-60 " + (currentStep === 4 ? "border-blue-500 bg-blue-50" : "border-gray-300");
+      
+      // Update button text based on step. At step 5, button shows "Reset"
+      const nextStepButton = document.getElementById('nextStepButton');
+      nextStepButton.innerText = (currentStep === 5 ? "Reset" : "Next Step");
+      document.getElementById('runSimulationButton').disabled = isRunning;
+      document.getElementById('nextStepButton').disabled = isRunning;
+      
+      // Refresh Lucide icons after DOM changes
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+      
+      // If document indexing is done, update the document store content
+      if (currentStep > 0) {
+        updateDocumentStore();
+      }
+    }
+    
+    // Run one simulation step (manual stepping)
+    function runStep() {
+      if (isRunning) return;
+      switch(currentStep) {
+        case 0:
+          // Step 0: Index documents
+          indexDocuments();
+          currentStep = 1;
+          break;
+        case 1:
+          // Step 1: Customer Query is already displayed; move to query embedding.
+          currentStep = 2;
+          break;
+        case 2:
+          // Step 2: Embed customer query.
+          queryEmbedding = embedQuery(query);
+          currentStep = 3;
+          break;
+        case 3:
+          // Step 3: Retrieve similar documents from the indexed documents.
+          retrievedDocs = findSimilarDocuments(queryEmbedding, indexedDocuments);
+          currentStep = 4;
+          break;
+        case 4:
+          // Step 4: Generate response.
+          generatedResponse = generateResponse(retrievedDocs, query);
+          currentStep = 5;
+          break;
+        case 5:
+          // Step 5: Reset simulation state.
+          currentStep = 0;
+          queryEmbedding = null;
+          retrievedDocs = [];
+          generatedResponse = '';
+          break;
+      }
+      updateUI();
+    }
+    
+    // Run the entire simulation automatically with delays
+    async function runSimulation() {
+      if (isRunning) return;
+      isRunning = true;
+      currentStep = 0;
+      queryEmbedding = null;
+      retrievedDocs = [];
+      generatedResponse = '';
+      updateUI();
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // Step 0: Index documents
+      indexDocuments();
+      currentStep = 1;
+      updateUI();
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // Step 1: (Customer query is already shown)
+      currentStep = 2;
+      updateUI();
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // Step 2: Embed query
+      queryEmbedding = embedQuery(query);
+      currentStep = 3;
+      updateUI();
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Step 3: Retrieve similar documents
+      retrievedDocs = findSimilarDocuments(queryEmbedding, indexedDocuments);
+      currentStep = 4;
+      updateUI();
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Step 4: Generate response
+      generatedResponse = generateResponse(retrievedDocs, query);
+      currentStep = 5;
+      updateUI();
+      
+      isRunning = false;
+      updateUI();
+    }
+    
+    // Event listeners
+    document.getElementById('runSimulationButton').addEventListener('click', runSimulation);
+    document.getElementById('nextStepButton').addEventListener('click', runStep);
+    document.getElementById('queryInput').addEventListener('input', function(e) {
+      query = e.target.value;
+      updateUI();
+    });
+    document.getElementById('embedDocumentsButton').addEventListener('click', function() {
+      indexDocuments();
+      updateDocVisual();
+    });
+    document.getElementById('toggleAccordionButton').addEventListener('click', function() {
+      document.getElementById('docVisualContainer').classList.toggle('hidden');
+    });
+    document.querySelectorAll('.sampleQuery').forEach(button => {
+      button.addEventListener('click', function() {
+        query = this.getAttribute('data-query');
+        document.getElementById('queryInput').value = query;
+        currentStep = 0;
+        queryEmbedding = null;
+        retrievedDocs = [];
+        generatedResponse = '';
+        updateUI();
+      });
+    });
+    
+    // Initialize the UI (documents are not indexed until step 0 or button click)
+    updateDocumentStore();
+    updateUI();
+  </script>
+</body>
+</html>
