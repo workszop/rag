@@ -336,6 +336,12 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
 
     .answer { margin: 0; white-space: pre-wrap; color: var(--ink); font-size: var(--body); line-height: 1.6; }
     .sources { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .prompt-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 16px; }
+    .msg { border: 1px solid var(--line-2); border-radius: var(--r-md); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+    .msg-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; background: var(--paper-3); border-bottom: 1px solid var(--line-2); }
+    .msg-head .edu-overline { margin: 0; }
+    .msg-text { margin: 0; padding: 14px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 340px; overflow-y: auto; flex: 1; }
+    .msg .waiting { padding: 14px; }
     .note-block { border-radius: var(--r-md); padding: 16px 20px; display: flex; gap: 12px; align-items: flex-start; }
     .note-block p { margin: 0; }
 
@@ -348,13 +354,14 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     [aria-expanded="false"] .chev { transform: rotate(-90deg); }
 
     /* ─── How it works ─── */
-    .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 20px; }
     .tiles .card-body p { margin: 0; font-size: var(--body-sm); }
 
     /* ─── Responsive ─── */
     @media (max-width: 1080px) {
       .kb-grid { grid-template-columns: repeat(2, 1fr); }
       .tiles { grid-template-columns: repeat(2, 1fr); }
+      .prompt-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 768px) {
       .edu-header-inner { padding: 6px 16px; }
@@ -406,7 +413,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         <div class="card-foot">
           <div class="progress">
             <span class="progress-label" id="progressLabel"></span>
-            <div class="progress-bar" role="progressbar" id="progressBar" aria-valuemin="0" aria-valuemax="5"><span id="progressFill"></span></div>
+            <div class="progress-bar" role="progressbar" id="progressBar" aria-valuemin="0"><span id="progressFill"></span></div>
             <span class="progress-status" id="progressStatus"></span>
           </div>
           <div class="shortcuts" id="shortcuts"></div>
@@ -421,7 +428,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
 
       <div class="card stage" data-stage="0" data-state="idle">
         <div class="card-head">
-          <span class="tile-h"><span class="badge tone-grape"><i data-lucide="database" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage0"></h3></span>
+          <span class="tile-h"><span class="badge tone-stone"><i data-lucide="database" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage0"></h3></span>
           <span class="edu-chip" data-chip></span>
         </div>
         <div class="card-body" id="kbBody"></div>
@@ -463,11 +470,33 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
 
       <div class="card stage" data-stage="4" data-state="idle">
         <div class="card-head">
-          <span class="tile-h"><span class="badge tone-ink"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage4"></h3></span>
+          <span class="tile-h"><span class="badge tone-grape"><i data-lucide="file-pen-line" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage4"></h3></span>
+          <span class="edu-chip" data-chip></span>
+        </div>
+        <div class="card-body">
+          <div class="prompt-grid">
+            <div class="msg" data-role="system">
+              <div class="msg-head"><span class="edu-overline" data-i18n="roleSystem"></span><span class="edu-chip chip-stone" data-i18n="systemFixed"></span></div>
+              <p class="msg-text" id="systemPromptText"></p>
+            </div>
+            <div class="msg" data-role="user">
+              <div class="msg-head"><span class="edu-overline" data-i18n="roleUser"></span><span class="edu-chip chip-stone" id="userPromptChip"></span></div>
+              <div id="userPromptBody"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-foot"><p data-i18n="stage4Desc"></p><span class="edu-chip chip-stone" id="promptStats"></span></div>
+      </div>
+
+      <div class="flow-down" aria-hidden="true"><i data-lucide="arrow-down" class="ic"></i></div>
+
+      <div class="card stage" data-stage="5" data-state="idle">
+        <div class="card-head">
+          <span class="tile-h"><span class="badge tone-ink"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage5"></h3></span>
           <span class="edu-chip" data-chip></span>
         </div>
         <div class="card-body" id="answerBody"></div>
-        <div class="card-foot"><p data-i18n="stage4Desc"></p><div class="sources" id="answerSources"></div></div>
+        <div class="card-foot"><p data-i18n="stage5Desc"></p><div class="sources" id="answerSources"></div></div>
       </div>
     </div></section>
 
@@ -485,9 +514,10 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     <section class="sec" aria-labelledby="secHow"><div class="wrap">
       <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="book-open" class="ic" aria-hidden="true"></i></span><h2 id="secHow" data-i18n="secHow"></h2></div>
       <div class="tiles">
-        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-grape"><i data-lucide="database" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how1Title"></h3></span></div><div class="card-body"><p data-i18n="how1"></p></div></div>
+        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-stone"><i data-lucide="database" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how1Title"></h3></span></div><div class="card-body"><p data-i18n="how1"></p></div></div>
         <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-yellow"><i data-lucide="cpu" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how2Title"></h3></span></div><div class="card-body"><p data-i18n="how2"></p></div></div>
         <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-green"><i data-lucide="search" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how3Title"></h3></span></div><div class="card-body"><p data-i18n="how3"></p></div></div>
+        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-grape"><i data-lucide="file-pen-line" class="ic" aria-hidden="true"></i></span><h3 data-i18n="howPromptTitle"></h3></span></div><div class="card-body"><p data-i18n="howPrompt"></p></div></div>
         <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-ink"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how4Title"></h3></span></div><div class="card-body"><p data-i18n="how4"></p></div></div>
       </div>
       <div class="note-block tone-yellow edu-block"><i data-lucide="lightbulb" class="ic" aria-hidden="true" style="margin-top: 3px;"></i><p data-i18n="howNote"></p></div>
@@ -496,12 +526,13 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
 
   <script>
     // ─── Constants ───
-    const STEP_COUNT = 5;
+    const STEP_COUNT = 6;
     const TOP_K = 3;
     const MIN_SIMILARITY = 0.3;
-    const RUN_DELAYS_MS = [500, 500, 500, 1000, 1000];
+    const RUN_DELAYS_MS = [500, 500, 500, 1000, 800, 1000];
     const LANG_KEY = 'rag-sim-lang';
     const LANGS = ['pl', 'en'];
+    const CHARS_PER_TOKEN = 4;   // rough estimate for the prompt size chip
     const PRODUCT_ICONS = { laptop: 'laptop', headphones: 'headphones', smartphone: 'smartphone', tv: 'monitor' };
 
     // Keyword patterns shared by both languages, so a Polish or English question
@@ -614,11 +645,26 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         shortcutsLabel: 'Skróty:',
         kRun: 'uruchom', kNext: 'następny krok', kReset: 'reset', kDocs: 'dokumenty', kLang: 'język',
         secFlow: 'Przepływ RAG',
-        stage0: 'Baza wiedzy', stage1: 'Pytanie klienta', stage2: 'Model osadzeń', stage3: 'Wyszukiwarka', stage4: 'Generator odpowiedzi',
+        stage0: 'Baza wiedzy', stage1: 'Pytanie klienta', stage2: 'Model osadzeń', stage3: 'Wyszukiwarka', stage4: 'Budowanie promptu', stage5: 'Generator odpowiedzi',
         stage0Desc: 'Krok 0: dokumenty zamieniane na wektory tym samym modelem co pytania',
         stage1Desc: 'Krok 1: klient wysyła pytanie',
         stage2Desc: 'Krok 2: pytanie zamieniane na wektor semantyczny',
-        stage4Desc: 'Krok 4: odpowiedź oparta wyłącznie na znalezionych dokumentach',
+        stage4Desc: 'Krok 4: prompt systemowy + znalezione dokumenty + pytanie trafiają do modelu',
+        stage5Desc: 'Krok 5: odpowiedź oparta wyłącznie na znalezionych dokumentach',
+        roleSystem: 'Prompt systemowy',
+        roleUser: 'Wiadomość użytkownika',
+        systemFixed: 'stały',
+        systemPrompt: 'Jesteś asystentem wsparcia technicznego produktów TechX, SoundWave, PixelPlus i SmartView.\n\nZasady:\n1. Odpowiadaj wyłącznie na podstawie dokumentów z sekcji KONTEKST.\n2. Jeśli kontekst nie zawiera odpowiedzi, napisz, że nie masz takich informacji. Nie zgaduj i nie korzystaj z wiedzy spoza kontekstu.\n3. Tam, gdzie to możliwe, podawaj instrukcje krok po kroku.\n4. Wskaż dokumenty, z których korzystasz, np. [Dok. 1].\n5. Odpowiadaj w języku użytkownika.',
+        promptContext: 'KONTEKST',
+        promptQuestion: 'PYTANIE',
+        promptNoContext: '(brak dokumentów powyżej progu podobieństwa)',
+        promptSimilarity: 'podobieństwo',
+        promptDocsChip: '{n} dok. w kontekście',
+        promptStats: 'ok. {tokens} tokenów',
+        waitPrompt: 'Czekam na dokumenty z wyszukiwarki…',
+        howPromptTitle: 'Budowanie promptu',
+        howPrompt: 'Znalezione dokumenty trafiają do sekcji KONTEKST, obok pytania. Prompt systemowy każe modelowi odpowiadać tylko na ich podstawie.',
+        livePrompt: 'Prompt zbudowany, dokumenty w kontekście: {n}.',
         chipIdle: 'czeka', chipActive: 'teraz', chipDone: 'gotowe',
         kbIndexed: 'zindeksowano', kbNotIndexed: 'brak indeksu',
         notIndexed: 'nie zindeksowano',
@@ -651,7 +697,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         how3Title: 'Wyszukiwanie dokumentów',
         how3: 'System liczy podobieństwo wektora pytania do każdego dokumentu i bierze najbardziej podobne, powyżej progu.',
         how4Title: 'Generowanie odpowiedzi',
-        how4: 'Model łączy znalezione informacje techniczne z pytaniem klienta i pisze konkretną odpowiedź, wskazując źródła.',
+        how4: 'Model czyta zbudowany prompt i pisze konkretną odpowiedź, wskazując źródła. Gdy kontekst jest pusty, mówi, że nie ma danych.',
         howNote: 'Jeśli pytanie nie dotyczy bazy wiedzy (np. pytanie o pogodę), żaden dokument nie przekroczy progu podobieństwa, a system powie, że nie ma danych, zamiast zgadywać.',
         liveIndexed: 'Zindeksowano {n} dokumentów.',
         liveQuery: 'Pytanie przyjęte.',
@@ -679,11 +725,26 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         shortcutsLabel: 'Shortcuts:',
         kRun: 'run', kNext: 'next step', kReset: 'reset', kDocs: 'documents', kLang: 'language',
         secFlow: 'RAG pipeline',
-        stage0: 'Knowledge base', stage1: 'Customer query', stage2: 'Embedding model', stage3: 'Retriever', stage4: 'Response generator',
+        stage0: 'Knowledge base', stage1: 'Customer query', stage2: 'Embedding model', stage3: 'Retriever', stage4: 'Prompt builder', stage5: 'Response generator',
         stage0Desc: 'Step 0: documents embedded with the same model as the queries',
         stage1Desc: 'Step 1: customer submits a support question',
         stage2Desc: 'Step 2: convert the query to a semantic vector',
-        stage4Desc: 'Step 4: answer grounded only in the retrieved documents',
+        stage4Desc: 'Step 4: system prompt + retrieved documents + question go to the model',
+        stage5Desc: 'Step 5: answer grounded only in the retrieved documents',
+        roleSystem: 'System prompt',
+        roleUser: 'User message',
+        systemFixed: 'fixed',
+        systemPrompt: "You are a technical support assistant for TechX, SoundWave, PixelPlus and SmartView products.\n\nRules:\n1. Answer only from the documents in the CONTEXT section.\n2. If the context does not contain the answer, say you have no information about it. Do not guess and do not use knowledge from outside the context.\n3. Give step-by-step instructions where possible.\n4. Name the documents you used, e.g. [Doc 1].\n5. Reply in the user's language.",
+        promptContext: 'CONTEXT',
+        promptQuestion: 'QUESTION',
+        promptNoContext: '(no documents above the similarity threshold)',
+        promptSimilarity: 'similarity',
+        promptDocsChip: '{n} docs in context',
+        promptStats: '~{tokens} tokens',
+        waitPrompt: 'Waiting for documents from the retriever…',
+        howPromptTitle: 'Prompt building',
+        howPrompt: 'The retrieved documents go into the CONTEXT section next to the question. The system prompt tells the model to answer from them only.',
+        livePrompt: 'Prompt built, documents in context: {n}.',
         chipIdle: 'waiting', chipActive: 'now', chipDone: 'done',
         kbIndexed: 'indexed', kbNotIndexed: 'not indexed',
         notIndexed: 'not indexed',
@@ -716,7 +777,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         how3Title: 'Document retrieval',
         how3: 'The system scores the query vector against every document and keeps the most similar ones above a threshold.',
         how4Title: 'Response generation',
-        how4: "The model combines the retrieved technical information with the customer's question and writes a specific answer, citing its sources.",
+        how4: 'The model reads the assembled prompt and writes a specific answer, citing its sources. With an empty context it says it has no data.',
         howNote: 'If the question is off-topic (for example, a weather question), no document passes the similarity threshold and the system says it has no data instead of guessing.',
         liveIndexed: 'Indexed {n} documents.',
         liveQuery: 'Query accepted.',
@@ -738,6 +799,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       queryVector: null,
       scores: [],          // every doc with its similarity, sorted desc
       retrieved: [],       // docs above MIN_SIMILARITY, top K
+      promptBuilt: false,
       answer: null,        // { kind: 'none' } | { kind: 'template', id, docIds } | { kind: 'combine', docIds }
       docsOpen: true,
     };
@@ -763,6 +825,10 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     const embedBody = $('embedBody');
     const retrieveBody = $('retrieveBody');
     const retrieveFoot = $('retrieveFoot');
+    const systemPromptText = $('systemPromptText');
+    const userPromptChip = $('userPromptChip');
+    const userPromptBody = $('userPromptBody');
+    const promptStats = $('promptStats');
     const answerBody = $('answerBody');
     const answerSources = $('answerSources');
     const embedDocsButton = $('embedDocsButton');
@@ -819,10 +885,22 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       return { kind: 'combine', docIds: hitIds };
     }
 
+    // User message sent to the model: retrieved documents as context, then the question
+    function buildUserPrompt() {
+      const context = state.retrieved.length
+        ? state.retrieved.map(r => {
+            const d = docById(r.id);
+            return `[${t('docShort')} ${d.id}] ${d.title[state.lang]} (${t('promptSimilarity')} ${r.similarity.toFixed(2)})\n${d.text[state.lang]}`;
+          }).join('\n\n')
+        : t('promptNoContext');
+      return `${t('promptContext')}:\n${context}\n\n${t('promptQuestion')}:\n${state.query.trim() || t('emptyQuery')}`;
+    }
+
     function clearPipeline() {
       state.queryVector = null;
       state.scores = [];
       state.retrieved = [];
+      state.promptBuilt = false;
       state.answer = null;
     }
 
@@ -839,6 +917,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       () => announce('liveQuery'),
       () => { state.queryVector = embed(state.query); announce('liveEmbedded'); },
       () => { retrieveDocs(); announce('liveRetrieved', { n: state.retrieved.length }); },
+      () => { state.promptBuilt = true; announce('livePrompt', { n: state.retrieved.length }); },
       () => { state.answer = generateAnswer(); announce('liveAnswered'); },
     ];
 
@@ -945,6 +1024,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
 
       progressLabel.textContent = `${t('stepWord')} ${state.step}/${STEP_COUNT}`;
       progressFill.style.width = (state.step / STEP_COUNT * 100) + '%';
+      progressBar.setAttribute('aria-valuemax', STEP_COUNT);
       progressBar.setAttribute('aria-valuenow', state.step);
       progressStatus.textContent = state.step < STEP_COUNT ? `${t('nextUp')}: ${t('stage' + state.step)}` : t('finished');
     }
@@ -997,6 +1077,26 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
               </div>`;
             }).join('')}</div>`
           : `<p class="waiting">${esc(t('noHits'))}</p>`);
+      }
+
+      // Prompt builder
+      systemPromptText.textContent = t('systemPrompt');
+      document.body.dataset.promptBuilt = state.promptBuilt;
+      if (state.promptBuilt) {
+        const userPrompt = buildUserPrompt();
+        const tokens = Math.ceil((t('systemPrompt').length + userPrompt.length) / CHARS_PER_TOKEN);
+        userPromptChip.textContent = t('promptDocsChip', { n: state.retrieved.length });
+        userPromptChip.hidden = false;
+        userPromptBody.innerHTML = `<p class="msg-text" id="userPromptText"></p>`;
+        userPromptBody.firstChild.textContent = userPrompt;
+        userPromptBody.dataset.promptDocs = state.retrieved.map(r => r.id).join(',');
+        promptStats.textContent = t('promptStats', { tokens });
+        promptStats.hidden = false;
+      } else {
+        userPromptChip.hidden = true;
+        userPromptBody.innerHTML = `<p class="waiting">${esc(t('waitPrompt'))}</p>`;
+        userPromptBody.dataset.promptDocs = '';
+        promptStats.hidden = true;
       }
 
       // Answer
