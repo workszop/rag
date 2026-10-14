@@ -216,324 +216,321 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
   <style>
     /* ─── Base ─── */
     * { box-sizing: border-box; }
-    body { margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { margin: 0; display: flex; flex-direction: column; overflow: hidden; }
     :focus-visible { outline: 3px solid transparent; outline-offset: 2px; box-shadow: var(--focus-ring); }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
     [hidden] { display: none !important; }
+    .ic { width: 18px; height: 18px; flex: none; }
 
     /* ─── Top menu ─── */
-    .edu-header { position: sticky; top: 0; z-index: 50; width: 100%; background: var(--paper); border-bottom: 1px solid var(--line-2); }
-    .edu-header-inner { max-width: 1100px; margin: 0 auto; padding: 8px 30px; display: flex; align-items: center; gap: 12px; }
-    .edu-logo { width: 64px; height: 64px; display: block; margin-right: -6px; }
+    .edu-header { position: sticky; top: 0; z-index: 50; width: 100%; background: var(--paper); border-bottom: 1px solid var(--line-2); flex: none; }
+    .edu-header-inner { padding: 6px 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .edu-logo { width: 56px; height: 56px; display: block; margin-right: -6px; }
     .edu-wordmark { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; color: var(--ink); }
-    .edu-header-inner .edu-seg { margin-left: auto; }
+    .app-name { font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--ink-2); margin-left: 6px; }
+    .hdr-ctrl { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .edu-seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--r-pill); }
     .edu-seg button { border: none; background: transparent; padding: 7px 14px; border-radius: var(--r-pill); font-family: var(--font-sans); font-weight: 600; color: var(--ink-2); cursor: pointer; transition: background-color .15s; }
     .edu-seg button:hover { background: var(--paper-3); }
     .edu-seg button.active { background: var(--yellow); color: var(--yellow-ink); }
 
-    /* ─── Page head ─── */
-    .page-head { max-width: 1100px; margin: 0 auto; padding: 44px 30px 52px; text-align: left; }
-    .app-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.3rem, 5vw, 3.3rem); letter-spacing: -.025em; line-height: 1.05; color: var(--ink); margin: 0 0 14px; }
-    .edu-lead { font-size: 1.15rem; line-height: 1.6; color: var(--ink-2); margin: 0; }
+    /* ─── Buttons ─── */
+    .edu-btn, .btn-ghost { display: inline-flex; align-items: center; gap: 7px; border-radius: var(--r-pill); padding: 9px 18px; font-family: var(--font-display); font-weight: 600; font-size: 16px; cursor: pointer; transition: background-color .15s, transform .12s cubic-bezier(.32,.72,.32,1); }
+    .edu-btn { background: var(--yellow); color: var(--on-primary); border: 1px solid var(--yellow); box-shadow: var(--shadow-primary); }
+    .edu-btn:hover { background: var(--yellow-600); }
+    .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); }
+    .btn-ghost:hover { background: var(--paper-2); }
+    .icon-only { padding: 9px 11px; }
+    .edu-btn:active, .btn-ghost:active { transform: scale(.96); }
+    .edu-btn:disabled, .btn-ghost:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
-    /* ─── Section bands ─── */
-    .sec { margin: 0; padding: 52px 0 60px; border-top: 1px solid var(--line); }
-    .sec:nth-of-type(odd) { background: var(--paper-2); }
-    .sec > .wrap { max-width: 1100px; margin: 0 auto; padding: 0 30px; }
-    .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
-    .sec-head h2 { margin: 0; }
-    .sec-head::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
-
-    /* ─── Tones & badges ─── */
-    .tone-grape  { background: var(--grape-soft);  color: var(--grape-ink); }
-    .tone-blue   { background: var(--blue-soft);   color: var(--blue-ink); }
-    .tone-yellow { background: var(--yellow-soft); color: var(--yellow-ink); }
-    .tone-green  { background: var(--green-soft);  color: var(--green-ink); }
-    .tone-ink    { background: var(--ink);         color: var(--paper); }
-    .tone-stone  { background: var(--paper-3);     color: var(--ink); }
-    .ic { width: 18px; height: 18px; flex: none; }
-    .badge { flex: none; width: 34px; height: 34px; border-radius: var(--r-sm); display: inline-grid; place-items: center; }
-    .badge-lg { width: 46px; height: 46px; border-radius: var(--r-md); }
-    .badge-lg .ic { width: 24px; height: 24px; }
-    .badge.tone-ink { color: var(--yellow); }
-    .tile-h { display: flex; align-items: center; gap: 12px; min-width: 0; }
-    .tile-h h3 { margin: 0; font-size: 18px; line-height: 1.3; }
-
-    /* ─── Cards ─── */
-    .card { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column; min-width: 0; transition: box-shadow .2s, border-color .2s; }
-    .card-head { padding: 14px 22px; background: var(--paper-2); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .card-body { padding: 20px 22px; flex: 1; min-width: 0; }
-    .card-foot { padding: 14px 22px; border-top: 1px dashed var(--line-2); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .card-foot p { margin: 0; font-size: var(--body-sm); }
-
-    /* ─── Chips ─── */
+    /* ─── Chips & tones ─── */
     .edu-chip { font-family: var(--font-mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; padding: 4px 10px; border-radius: var(--r-pill); white-space: nowrap; }
     .chip-stone  { background: var(--paper-3); color: var(--ink); }
     .chip-yellow { background: var(--yellow-soft); color: var(--yellow-ink); }
     .chip-green  { background: var(--green-soft); color: var(--green-ink); }
     .chip-blue   { background: var(--blue-soft); color: var(--blue-ink); }
-
-    /* ─── Controls ─── */
-    .field-label { display: block; margin: 0 0 8px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: var(--ink); }
-    .query-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .input { flex: 1 1 320px; min-width: 0; padding: 11px 14px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); font: inherit; font-size: var(--body); background: var(--surface); color: var(--ink); }
-    .input::placeholder { color: var(--ink-3); }
-    .input[readonly] { background: var(--paper-2); }
-    .edu-btn, .btn-ghost { display: inline-flex; align-items: center; gap: 8px; border-radius: var(--r-pill); padding: 11px 20px; font-family: var(--font-display); font-weight: 600; font-size: 16px; cursor: pointer; transition: background-color .15s, transform .12s cubic-bezier(.32,.72,.32,1); }
-    .edu-btn { background: var(--yellow); color: var(--on-primary); border: 1px solid var(--yellow); box-shadow: var(--shadow-primary); }
-    .edu-btn:hover { background: var(--yellow-600); }
-    .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); }
-    .btn-ghost:hover { background: var(--paper-2); }
-    .edu-btn:active, .btn-ghost:active { transform: scale(.96); }
-    .edu-btn:disabled, .btn-ghost:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-    .samples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
-    .sample { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); border-radius: var(--r-pill); padding: 7px 14px; font-family: var(--font-sans); font-size: var(--body-sm); cursor: pointer; text-align: left; transition: background-color .15s; }
-    .sample:hover { background: var(--paper-2); }
-    .sample[aria-pressed="true"] { background: var(--blue-soft); border-color: var(--blue-soft); color: var(--blue-ink); }
+    .tone-stone  { background: var(--paper-3); color: var(--ink); }
+    .tone-blue   { background: var(--blue-soft); color: var(--blue-ink); }
+    .tone-yellow { background: var(--yellow-soft); color: var(--yellow-ink); }
+    .tone-green  { background: var(--green-soft); color: var(--green-ink); }
+    .tone-grape  { background: var(--grape-soft); color: var(--grape-ink); }
+    .tone-ink    { background: var(--ink); color: var(--yellow); }
+    .tone-off    { background: var(--paper-2); color: var(--ink-3); border: 1px dashed var(--line-2); }
+    .badge { flex: none; width: 34px; height: 34px; border-radius: var(--r-sm); display: inline-grid; place-items: center; }
+    .badge-lg { width: 46px; height: 46px; border-radius: var(--r-md); }
+    .badge-lg .ic { width: 24px; height: 24px; }
     kbd { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--line-strong); border-radius: var(--r-xs); padding: 1px 6px; background: var(--surface); color: var(--ink); }
-    .shortcuts { color: var(--ink-2); font-size: var(--caption); display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+    .edu-overline { margin: 0; }
 
-    /* ─── Progress ─── */
-    .progress { display: flex; align-items: center; gap: 14px; flex: 1 1 320px; }
-    .progress-label { font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink); white-space: nowrap; }
-    .progress-bar { flex: 1; min-width: 80px; height: 10px; background: var(--paper-3); border-radius: var(--r-pill); overflow: hidden; }
-    .progress-bar span { display: block; height: 100%; background: var(--yellow); border-radius: var(--r-pill); transition: width .3s; }
-    .progress-status { font-size: var(--body-sm); color: var(--ink-2); }
+    /* ─── App layout ─── */
+    .app { flex: 1; display: grid; grid-template-columns: minmax(340px, 34%) minmax(0, 1fr); min-height: 0; }
 
-    /* ─── RAG flow ─── */
-    .flow-row { display: grid; grid-template-columns: 1fr 32px 1fr 32px 1fr; align-items: stretch; }
-    .flow-arrow { display: grid; place-items: center; color: var(--ink-3); }
-    .flow-down { display: grid; place-items: center; color: var(--ink-3); padding: 10px 0; }
-    .stage[data-state="active"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink), var(--shadow-md); }
-    .stage .card-body { min-height: 190px; }
-    .scroll { max-height: 260px; overflow-y: auto; }
-    .waiting { margin: 0; color: var(--ink-3); font-style: italic; font-size: var(--body-sm); }
-    .well { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px; color: var(--ink); overflow-wrap: anywhere; }
-    .raw-vec { margin: 12px 0 0; font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); overflow-wrap: anywhere; }
-    .card-body .edu-overline { margin: 0 0 10px; }
+    /* ─── Chat (customer view) ─── */
+    .chat { background: var(--paper-2); border-right: 1px solid var(--line-2); display: flex; flex-direction: column; gap: 12px; padding: 18px 22px; min-height: 0; font-size: clamp(14px, .95vw, 18px); }
+    .chat-head { display: flex; align-items: center; gap: 12px; }
+    .chat-head h2 { margin: 0; font-size: 1.25em; flex: 1; }
+    .chat-log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px 2px; }
+    .chat-log > :first-child { margin-top: auto; }
+    .msg-bot, .msg-me, .typing { max-width: 92%; border-radius: 16px; padding: 11px 15px; line-height: 1.5; animation: msgIn .25s ease-out both; }
+    .msg-bot { align-self: flex-start; background: var(--surface); border: 1px solid var(--line-2); border-bottom-left-radius: 5px; color: var(--ink); }
+    .msg-me { align-self: flex-end; background: var(--blue-soft); color: var(--blue-ink); border-bottom-right-radius: 5px; overflow-wrap: anywhere; }
+    .msg-bot p { margin: 0 0 8px; color: var(--ink); white-space: pre-wrap; }
+    .msg-bot p:last-child { margin-bottom: 0; }
+    .typing { align-self: flex-start; display: inline-flex; gap: 5px; background: var(--surface); border: 1px solid var(--line-2); }
+    .typing i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); animation: dot 1.2s infinite ease-in-out; }
+    .typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+    @keyframes dot { 0%, 80%, 100% { opacity: .3; } 40% { opacity: 1; } }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } }
+    .sources { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line-2); display: grid; gap: 6px; }
+    .sources .edu-overline { font-size: 11px; }
+    .doc-link { display: inline-flex; align-items: center; gap: 7px; color: var(--blue-600); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; overflow-wrap: anywhere; }
+    .doc-link:hover { color: var(--ink); }
+    .doc-link .ic { width: 16px; height: 16px; }
+    .doc-link .sim { font-family: var(--font-mono); font-size: .8em; color: var(--ink-2); font-weight: 400; text-decoration: none; }
+    .samples-label { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink); margin: 0 0 6px; }
+    .samples { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sample { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); border-radius: var(--r-pill); padding: 5px 12px; font-family: var(--font-sans); font-size: .82em; cursor: pointer; text-align: left; transition: background-color .15s; }
+    .sample:hover { background: var(--paper-3); }
+    .sample[aria-pressed="true"] { background: var(--blue-soft); border-color: var(--blue-soft); color: var(--blue-ink); }
+    .chat-form { display: flex; gap: 8px; }
+    .chat-input { flex: 1; min-width: 0; padding: 11px 16px; border: 1px solid var(--line-strong); border-radius: var(--r-pill); font: inherit; font-size: 1em; background: var(--surface); color: var(--ink); }
+    .chat-input::placeholder { color: var(--ink-3); }
+    .chat-input[readonly] { background: var(--paper-3); }
+    .shortcuts { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--ink-2); }
 
-    .kb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .kb-doc { border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-    .kb-doc[data-hit="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
-    .kb-doc-top { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
-    .kb-doc-title { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.35; display: flex; gap: 6px; align-items: flex-start; }
-    .kb-doc-title .ic { width: 16px; height: 16px; margin-top: 1px; }
-    .kb-doc-vec { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
+    /* ─── Behind the scenes ─── */
+    .back { display: flex; flex-direction: column; gap: 14px; padding: 16px 26px 18px; min-height: 0; min-width: 0; font-size: clamp(14px, 1vw, 20px); }
+    .back-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .back-head .edu-overline { flex: 1; min-width: 160px; }
+    .stepper { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .step-btn { display: inline-flex; align-items: center; gap: 7px; border: none; background: transparent; padding: 3px 8px 3px 3px; border-radius: var(--r-pill); font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--ink); cursor: pointer; }
+    .step-btn .badge { width: 30px; height: 30px; border-radius: 9px; }
+    .step-btn .badge .ic { width: 16px; height: 16px; }
+    .step-btn:disabled { cursor: default; }
+    .step-btn:not(:disabled):hover { background: var(--paper-2); }
+    .step-btn[aria-current="step"] { background: var(--yellow); color: var(--yellow-ink); }
+    .step-sep { width: 14px; height: 1px; background: var(--line-2); }
+    .stage-card { flex: 1; min-height: 0; background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column; }
+    .stage-card[data-stage]:not([data-stage="intro"]) { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink), var(--shadow-md); }
+    .stage-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; background: var(--paper-2); border-bottom: 1px solid var(--line); flex: none; }
+    .stage-head .tile-h { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .stage-head h3 { margin: 0; font-size: 1.45em; }
+    .stage-body { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 22px 20px; display: flex; flex-direction: column; gap: 14px; }
+    .talk { margin: 0; font-size: 1.08em; line-height: 1.5; color: var(--ink-2); }
+    .reveal > * { animation: fadeUp .35s ease-out both; animation-delay: calc(var(--i, 0) * 90ms); }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } }
+    .over-mono { font-family: var(--font-mono); font-size: .72em; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); margin: 0; }
+    .waiting { margin: 0; color: var(--ink-3); font-style: italic; }
+    .s-prog { height: 6px; background: var(--paper-3); flex: none; }
+    .s-prog span { display: block; height: 100%; background: var(--yellow); transition: width .3s; }
 
-    .vec { display: grid; gap: 7px; }
-    .vec-row { display: grid; grid-template-columns: 84px 1fr 44px; gap: 8px; align-items: center; font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); }
-    .vec-row .val { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
-    .track { height: 8px; background: var(--paper-3); border-radius: var(--r-pill); overflow: hidden; }
+    /* intro */
+    .intro-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.9rem, 2.6vw, 3rem); letter-spacing: -.025em; line-height: 1.05; color: var(--ink); margin: 0; }
+    .intro-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .intro-tile { border: 1px solid var(--line-2); border-radius: var(--r-md); overflow: hidden; }
+    .intro-tile-h { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--paper-2); border-bottom: 1px solid var(--line); font-family: var(--font-display); font-weight: 700; font-size: 1em; }
+    .intro-tile p { margin: 0; padding: 10px 14px 12px; font-size: .9em; color: var(--ink-2); }
+    .callout { border-radius: var(--r-md); padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start; }
+    .callout p { margin: 0; }
+
+    /* vectors */
+    .emb { display: grid; gap: 4px; }
+    .emb-row { display: grid; grid-template-columns: minmax(0, 1fr) 30px repeat(4, minmax(64px, 6.4em)); gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+    .emb-row.head { border-bottom: 1px solid var(--line-2); padding-top: 0; font-family: var(--font-mono); font-size: .72em; text-transform: uppercase; letter-spacing: .08em; color: var(--ink); }
+    .emb-doc { min-width: 0; display: flex; gap: 8px; align-items: flex-start; }
+    .emb-doc b { display: block; font-size: .92em; line-height: 1.3; }
+    .emb-doc small { display: block; color: var(--ink-3); font-size: .78em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .emb-doc .ic { margin-top: 2px; }
+    .emb-doc > span { min-width: 0; }
+    .emb-row > * { min-width: 0; }
+    .emb-arrow { color: var(--ink-3); display: grid; place-items: center; }
+    .cell { display: grid; gap: 3px; font-family: var(--font-mono); font-size: .75em; color: var(--ink); }
+    .track { height: 7px; background: var(--paper-3); border-radius: var(--r-pill); overflow: hidden; }
     .track span { display: block; height: 100%; background: var(--ink); border-radius: var(--r-pill); }
+    .vec { display: grid; gap: 12px; max-width: 760px; }
+    .vec-row { display: grid; grid-template-columns: 8em 1fr 3.5em; gap: 14px; align-items: center; font-family: var(--font-mono); font-size: 1.05em; }
+    .vec-row .track { height: 12px; }
+    .vec-row .v { text-align: right; }
+    .raw { margin: 0; font-family: var(--font-mono); font-size: .9em; color: var(--ink-2); }
+    .bubble { font-family: var(--font-display); font-weight: 600; font-size: 2em; line-height: 1.25; background: var(--paper-2); border: 1px solid var(--line-2); border-radius: var(--r-lg); padding: 18px 24px; margin: 0; overflow-wrap: anywhere; }
 
-    .hits { display: grid; gap: 8px; }
-    .hit { border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 10px 12px; display: grid; gap: 6px; }
-    .hit-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--ink); }
-    .hit-top span { display: inline-flex; align-items: center; gap: 6px; }
-    .hit-title { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
-    .hit-meta { margin: 0 0 10px; font-size: var(--body-sm); color: var(--ink-2); }
+    /* matching */
+    .match { display: grid; grid-template-columns: minmax(260px, 42%) minmax(0, 1fr); gap: 22px; align-items: start; }
+    .angle svg { width: 100%; height: auto; display: block; }
+    .angle .arc { fill: none; stroke: var(--line-2); stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .angle .cone { fill: var(--paper-2); }
+    .angle .axis { stroke: var(--line-2); stroke-width: 1.5; }
+    .angle .thr { stroke: var(--line-strong); stroke-width: 1.5; stroke-dasharray: 6 4; }
+    .angle .q-ray { stroke: var(--ink); stroke-width: 4; stroke-linecap: round; }
+    .angle .q-head { fill: var(--ink); }
+    .angle .d-ray { stroke: var(--line-2); stroke-width: 1.5; }
+    .angle .d-ray.in { stroke: var(--green-600); stroke-width: 2.5; }
+    .angle .dot circle { stroke-width: 2; }
+    .angle .dot.in circle { fill: var(--green-soft); stroke: var(--green-soft); }
+    .angle .dot.in text { fill: var(--green-ink); }
+    .angle .dot.above circle { fill: var(--surface); stroke: var(--ink); }
+    .angle .dot.above text { fill: var(--ink); }
+    .angle .dot.below circle { fill: var(--paper-3); stroke: var(--line-strong); }
+    .angle .dot.below text { fill: var(--ink-2); }
+    .angle text { font-family: var(--font-mono); font-size: 12px; fill: var(--ink); }
+    .angle .dot text { font-size: 12px; font-weight: 500; text-anchor: middle; dominant-baseline: central; }
+    .angle .lbl-muted { fill: var(--ink-2); }
+    .angle-cap { margin: 8px 0 0; font-size: .85em; color: var(--ink-2); }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .rank { display: grid; gap: 2px; }
+    .rank-row { display: grid; grid-template-columns: 5em minmax(0, 1fr) auto minmax(3em, 7em) 3em; gap: 10px; padding: 5px 10px; border-radius: var(--r-sm); align-items: center; font-size: .9em; }
+    .rank-row:nth-child(even) { background: var(--paper-2); }
+    .rank-row.query { background: var(--paper-3); }
+    .rank-title { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rank-row.below .rank-title { color: var(--ink-2); }
+    .rank-row.query .rank-title { grid-column: 1 / 3; display: flex; align-items: center; gap: 8px; }
+    .rank-row .v { font-family: var(--font-mono); font-size: .9em; text-align: right; }
+    .rank-row .edu-chip { justify-self: start; }
+    .chip-above { background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+    .chip-below { background: var(--paper-3); color: var(--ink-2); }
+    .rank-row.below .track span { background: var(--line-strong); }
+    .fp { display: flex; align-items: flex-end; gap: 3px; height: 22px; }
+    .fp b { width: 9px; height: 100%; background: var(--paper-3); border-radius: 2px; display: flex; align-items: flex-end; overflow: hidden; }
+    .fp b i { display: block; width: 100%; background: var(--ink); }
+    .rank-row.query .fp b { background: var(--surface); }
 
-    .answer { margin: 0; white-space: pre-wrap; color: var(--ink); font-size: var(--body); line-height: 1.6; }
-    .sources { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-    .prompt-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 16px; }
-    .msg { border: 1px solid var(--line-2); border-radius: var(--r-md); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
-    .msg-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; background: var(--paper-3); border-bottom: 1px solid var(--line-2); }
-    .msg-head .edu-overline { margin: 0; }
-    .msg-text { margin: 0; padding: 14px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 340px; overflow-y: auto; flex: 1; }
-    .msg .waiting { padding: 14px; }
-    .note-block { border-radius: var(--r-md); padding: 16px 20px; display: flex; gap: 12px; align-items: flex-start; }
-    .note-block p { margin: 0; }
+    /* prompt */
+    .prompt-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 14px; flex: 1; min-height: 0; }
+    .msg { border: 1px solid var(--line-2); border-radius: var(--r-md); overflow: hidden; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+    .msg-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 14px; background: var(--paper-3); border-bottom: 1px solid var(--line-2); }
+    .msg-text { margin: 0; padding: 12px 14px; font-family: var(--font-mono); font-size: .8em; line-height: 1.6; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; overflow-y: auto; flex: 1; }
 
-    /* ─── Documents ─── */
-    .doc-tools { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-    .doc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .doc-grid .card-body p { margin: 0; font-size: var(--body-sm); }
-    .doc-grid .card-foot { display: block; }
-    .chev { transition: transform .2s; }
-    [aria-expanded="false"] .chev { transform: rotate(-90deg); }
+    /* answer stage */
+    .answer-text { margin: 0; white-space: pre-wrap; font-size: 1.05em; line-height: 1.55; color: var(--ink); }
+    .answer-src { display: grid; gap: 8px; }
 
-    /* ─── How it works ─── */
-    .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 20px; }
-    .tiles .card-body p { margin: 0; font-size: var(--body-sm); }
+    /* ─── Documents drawer ─── */
+    .drawer { margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(600px, 100vw); max-width: 100vw; border: none; border-left: 1px solid var(--line-2); padding: 0; background: var(--paper); color: var(--ink); box-shadow: var(--shadow-lg); }
+    .drawer[open] { display: flex; flex-direction: column; animation: slideIn .25s ease-out; }
+    .drawer::backdrop { background: color-mix(in srgb, var(--ink) 35%, transparent); }
+    @keyframes slideIn { from { transform: translateX(30px); opacity: 0; } }
+    .drawer-head { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line-2); background: var(--paper-2); }
+    .drawer-head h2 { margin: 0; font-size: 1.35rem; flex: 1; }
+    .drawer-body { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 20px 28px; display: flex; flex-direction: column; gap: 14px; }
+    .doc { flex: none; background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); overflow: hidden; scroll-margin: 16px; }
+    .doc[data-focus="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink), var(--shadow-md); }
+    .doc-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; background: var(--paper-2); border-bottom: 1px solid var(--line); }
+    .doc-head .tile-h { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .doc-head h3 { margin: 0; font-size: 1.05rem; line-height: 1.3; }
+    .doc-body { padding: 14px 16px; }
+    .doc-body p { margin: 0; font-size: var(--body-sm); }
+    .doc-foot { padding: 12px 16px; border-top: 1px dashed var(--line-2); display: grid; gap: 8px; font-size: 14px; }
+    .doc-foot .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .doc-vec { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 
     /* ─── Responsive ─── */
-    @media (max-width: 1080px) {
-      .kb-grid { grid-template-columns: repeat(2, 1fr); }
-      .tiles { grid-template-columns: repeat(2, 1fr); }
-      .prompt-grid { grid-template-columns: 1fr; }
+    @media (max-width: 1100px) {
+      .match { grid-template-columns: 1fr; }
+      .angle { max-width: 420px; }
+      .intro-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 768px) {
-      .edu-header-inner { padding: 6px 16px; }
-      .edu-logo { width: 48px; height: 48px; }
-      .page-head { padding: 28px 16px 36px; }
-      .sec { padding: 36px 0 44px; } .sec > .wrap { padding: 0 16px; }
-      .sec-head { flex-wrap: wrap; }
-      .sec-head h2 { flex: 1; min-width: 0; font-size: 26px; }
-      .sec-head::after { flex: 1 0 100%; }
-      .flow-row { grid-template-columns: 1fr; }
-      .flow-arrow { padding: 10px 0; transform: rotate(90deg); }
-      .kb-grid, .doc-grid, .tiles { grid-template-columns: 1fr; }
-      .card-head, .card-body, .card-foot { padding-left: 16px; padding-right: 16px; }
+      body { overflow: auto; height: auto; }
+      .edu-header-inner { padding: 6px 12px; }
+      .edu-logo { width: 44px; height: 44px; }
+      .app-name { display: none; }
+      .hdr-ctrl .label { display: none; }
+      .app { grid-template-columns: 1fr; }
+      .chat { border-right: none; border-bottom: 1px solid var(--line-2); padding: 14px; }
+      .chat-log { max-height: 60vh; }
+      .back { padding: 14px 12px 18px; }
+      .stage-card { flex: none; }
+      .stage-body { padding: 14px; overflow: visible; }
+      .prompt-grid, .intro-tiles { grid-template-columns: 1fr; }
+      .emb-row { grid-template-columns: minmax(0, 1fr) repeat(4, 44px); gap: 6px; }
+      .emb-arrow { display: none; }
+      .bubble { font-size: 1.4em; }
+      .step-btn .lbl { display: none; }
     }
-    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   </style>
 </head>
-<body class="edu" data-step="0" data-running="false" data-indexed="false">
+<body class="edu" data-done="0" data-view="-1" data-running="false" data-indexed="false" data-chat="empty">
   <header class="edu-header"><div class="edu-header-inner">
     <img class="edu-logo" alt="edulab" src="data:image/png;base64,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">
     <span class="edu-wordmark">edulab</span>
-    <div class="edu-seg" role="group" data-i18n-aria="langSwitch">
-      <button type="button" data-lang="pl" lang="pl">PL</button>
-      <button type="button" data-lang="en" lang="en">EN</button>
+    <span class="app-name" data-i18n="appName"></span>
+    <div class="hdr-ctrl">
+      <button id="backButton" type="button" class="btn-ghost icon-only" data-i18n-aria="back"><i data-lucide="chevron-left" class="ic" aria-hidden="true"></i></button>
+      <button id="nextButton" type="button" class="edu-btn"><span id="nextLabel"></span><i data-lucide="chevron-right" class="ic" aria-hidden="true"></i></button>
+      <button id="resetButton" type="button" class="btn-ghost"><i data-lucide="rotate-ccw" class="ic" aria-hidden="true"></i><span class="label" data-i18n="restart"></span></button>
+      <button id="docsButton" type="button" class="btn-ghost" aria-haspopup="dialog"><i data-lucide="library" class="ic" aria-hidden="true"></i><span class="label" data-i18n="docs"></span></button>
+      <div class="edu-seg" role="group" data-i18n-aria="langSwitch">
+        <button type="button" data-lang="pl" lang="pl">PL</button>
+        <button type="button" data-lang="en" lang="en">EN</button>
+      </div>
     </div>
   </div></header>
 
-  <header class="page-head">
-    <h1 class="app-title" data-i18n="title"></h1>
-    <p class="edu-lead" data-i18n="lead"></p>
-  </header>
-
-  <main>
-    <!-- ─── Query ─── -->
-    <section class="sec" aria-labelledby="secQuery"><div class="wrap">
-      <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="message-circle-question" class="ic" aria-hidden="true"></i></span><h2 id="secQuery" data-i18n="secQuery"></h2></div>
-      <div class="card">
-        <div class="card-body">
-          <label class="field-label" for="queryInput" data-i18n="queryLabel"></label>
-          <div class="query-row">
-            <input id="queryInput" class="input" type="text" autocomplete="off" data-i18n-placeholder="queryPlaceholder">
-            <button id="runButton" type="button" class="edu-btn"><i data-lucide="play" class="ic" aria-hidden="true"></i><span data-i18n="run"></span></button>
-            <button id="nextButton" type="button" class="btn-ghost"><i data-lucide="step-forward" class="ic" aria-hidden="true"></i><span id="nextLabel"></span></button>
-            <button id="resetButton" type="button" class="btn-ghost"><i data-lucide="rotate-ccw" class="ic" aria-hidden="true"></i><span data-i18n="reset"></span></button>
-          </div>
-          <p class="field-label" style="margin-top: 22px;" data-i18n="samplesLabel"></p>
-          <div class="samples" id="samples" style="margin-top: 0;"></div>
-        </div>
-        <div class="card-foot">
-          <div class="progress">
-            <span class="progress-label" id="progressLabel"></span>
-            <div class="progress-bar" role="progressbar" id="progressBar" aria-valuemin="0"><span id="progressFill"></span></div>
-            <span class="progress-status" id="progressStatus"></span>
-          </div>
-          <div class="shortcuts" id="shortcuts"></div>
-        </div>
+  <main class="app">
+    <!-- ─── Customer view ─── -->
+    <section class="chat" aria-labelledby="chatTitle">
+      <div class="chat-head">
+        <span class="badge tone-ink"><i data-lucide="headset" class="ic" aria-hidden="true"></i></span>
+        <h2 id="chatTitle" data-i18n="chatTitle"></h2>
+        <span class="edu-chip chip-stone" data-i18n="chatView"></span>
       </div>
-      <p class="sr-only" aria-live="polite" id="live"></p>
-    </div></section>
-
-    <!-- ─── Pipeline ─── -->
-    <section class="sec" aria-labelledby="secFlow"><div class="wrap">
-      <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="workflow" class="ic" aria-hidden="true"></i></span><h2 id="secFlow" data-i18n="secFlow"></h2></div>
-
-      <div class="card stage" data-stage="0" data-state="idle">
-        <div class="card-head">
-          <span class="tile-h"><span class="badge tone-stone"><i data-lucide="database" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage0"></h3></span>
-          <span class="edu-chip" data-chip></span>
-        </div>
-        <div class="card-body" id="kbBody"></div>
-        <div class="card-foot"><p data-i18n="stage0Desc"></p><span class="edu-chip chip-stone" id="kbStatus"></span></div>
+      <div class="chat-log" id="chatLog" aria-live="polite"></div>
+      <div>
+        <p class="samples-label" data-i18n="samplesLabel"></p>
+        <div class="samples" id="samples"></div>
       </div>
+      <form class="chat-form" id="chatForm">
+        <label class="sr-only" for="queryInput" data-i18n="queryLabel"></label>
+        <input id="queryInput" class="chat-input" type="text" autocomplete="off" data-i18n-placeholder="queryPlaceholder">
+        <button type="submit" class="edu-btn" id="sendButton"><i data-lucide="send" class="ic" aria-hidden="true"></i><span data-i18n="send"></span></button>
+      </form>
+      <div class="shortcuts" id="shortcuts"></div>
+    </section>
 
-      <div class="flow-down" aria-hidden="true"><i data-lucide="arrow-down" class="ic"></i></div>
-
-      <div class="flow-row">
-        <div class="card stage" data-stage="1" data-state="idle">
-          <div class="card-head">
-            <span class="tile-h"><span class="badge tone-blue"><i data-lucide="file-text" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage1"></h3></span>
-            <span class="edu-chip" data-chip></span>
-          </div>
-          <div class="card-body" id="queryBody"></div>
-          <div class="card-foot"><p data-i18n="stage1Desc"></p></div>
-        </div>
-        <div class="flow-arrow" aria-hidden="true"><i data-lucide="arrow-right" class="ic"></i></div>
-        <div class="card stage" data-stage="2" data-state="idle">
-          <div class="card-head">
-            <span class="tile-h"><span class="badge tone-yellow"><i data-lucide="cpu" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage2"></h3></span>
-            <span class="edu-chip" data-chip></span>
-          </div>
-          <div class="card-body" id="embedBody"></div>
-          <div class="card-foot"><p data-i18n="stage2Desc"></p></div>
-        </div>
-        <div class="flow-arrow" aria-hidden="true"><i data-lucide="arrow-right" class="ic"></i></div>
-        <div class="card stage" data-stage="3" data-state="idle">
-          <div class="card-head">
-            <span class="tile-h"><span class="badge tone-green"><i data-lucide="search" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage3"></h3></span>
-            <span class="edu-chip" data-chip></span>
-          </div>
-          <div class="card-body" id="retrieveBody"></div>
-          <div class="card-foot"><p id="retrieveFoot"></p></div>
-        </div>
+    <!-- ─── Behind the scenes ─── -->
+    <section class="back" aria-labelledby="backLabel">
+      <div class="back-head">
+        <h2 class="edu-overline" id="backLabel"></h2>
+        <nav class="stepper" id="stepper" data-i18n-aria="stepsNav"></nav>
       </div>
-
-      <div class="flow-down" aria-hidden="true"><i data-lucide="arrow-down" class="ic"></i></div>
-
-      <div class="card stage" data-stage="4" data-state="idle">
-        <div class="card-head">
-          <span class="tile-h"><span class="badge tone-grape"><i data-lucide="file-pen-line" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage4"></h3></span>
-          <span class="edu-chip" data-chip></span>
-        </div>
-        <div class="card-body">
-          <div class="prompt-grid">
-            <div class="msg" data-role="system">
-              <div class="msg-head"><span class="edu-overline" data-i18n="roleSystem"></span><span class="edu-chip chip-stone" data-i18n="systemFixed"></span></div>
-              <p class="msg-text" id="systemPromptText"></p>
-            </div>
-            <div class="msg" data-role="user">
-              <div class="msg-head"><span class="edu-overline" data-i18n="roleUser"></span><span class="edu-chip chip-stone" id="userPromptChip"></span></div>
-              <div id="userPromptBody"></div>
-            </div>
-          </div>
-        </div>
-        <div class="card-foot"><p data-i18n="stage4Desc"></p><span class="edu-chip chip-stone" id="promptStats"></span></div>
-      </div>
-
-      <div class="flow-down" aria-hidden="true"><i data-lucide="arrow-down" class="ic"></i></div>
-
-      <div class="card stage" data-stage="5" data-state="idle">
-        <div class="card-head">
-          <span class="tile-h"><span class="badge tone-ink"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage5"></h3></span>
-          <span class="edu-chip" data-chip></span>
-        </div>
-        <div class="card-body" id="answerBody"></div>
-        <div class="card-foot"><p data-i18n="stage5Desc"></p><div class="sources" id="answerSources"></div></div>
-      </div>
-    </div></section>
-
-    <!-- ─── Documents ─── -->
-    <section class="sec" aria-labelledby="secDocs"><div class="wrap">
-      <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="layers" class="ic" aria-hidden="true"></i></span><h2 id="secDocs" data-i18n="secDocs"></h2></div>
-      <div class="doc-tools">
-        <button id="embedDocsButton" type="button" class="edu-btn"><i data-lucide="sparkles" class="ic" aria-hidden="true"></i><span data-i18n="embedDocs"></span></button>
-        <button id="toggleDocsButton" type="button" class="btn-ghost" aria-controls="docGrid" aria-expanded="true"><i data-lucide="chevron-down" class="ic chev" aria-hidden="true"></i><span id="toggleDocsLabel"></span></button>
-      </div>
-      <div class="doc-grid" id="docGrid"></div>
-    </div></section>
-
-    <!-- ─── How it works ─── -->
-    <section class="sec" aria-labelledby="secHow"><div class="wrap">
-      <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="book-open" class="ic" aria-hidden="true"></i></span><h2 id="secHow" data-i18n="secHow"></h2></div>
-      <div class="tiles">
-        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-stone"><i data-lucide="database" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how1Title"></h3></span></div><div class="card-body"><p data-i18n="how1"></p></div></div>
-        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-yellow"><i data-lucide="cpu" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how2Title"></h3></span></div><div class="card-body"><p data-i18n="how2"></p></div></div>
-        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-green"><i data-lucide="search" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how3Title"></h3></span></div><div class="card-body"><p data-i18n="how3"></p></div></div>
-        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-grape"><i data-lucide="file-pen-line" class="ic" aria-hidden="true"></i></span><h3 data-i18n="howPromptTitle"></h3></span></div><div class="card-body"><p data-i18n="howPrompt"></p></div></div>
-        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-ink"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how4Title"></h3></span></div><div class="card-body"><p data-i18n="how4"></p></div></div>
-      </div>
-      <div class="note-block tone-yellow edu-block"><i data-lucide="lightbulb" class="ic" aria-hidden="true" style="margin-top: 3px;"></i><p data-i18n="howNote"></p></div>
-    </div></section>
+      <article class="stage-card" id="stageCard" data-stage="intro"></article>
+    </section>
   </main>
+  <div class="s-prog" role="progressbar" id="progressBar" aria-valuemin="0"><span id="progressFill"></span></div>
+  <p class="sr-only" aria-live="polite" id="live"></p>
+
+  <dialog class="drawer" id="drawer" aria-labelledby="drawerTitle">
+    <div class="drawer-head">
+      <span class="badge tone-ink"><i data-lucide="library" class="ic" aria-hidden="true"></i></span>
+      <h2 id="drawerTitle" data-i18n="drawerTitle"></h2>
+      <button type="button" class="btn-ghost icon-only" id="drawerClose" data-i18n-aria="close"><i data-lucide="x" class="ic" aria-hidden="true"></i></button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </dialog>
 
   <script>
     // ─── Constants ───
     const STEP_COUNT = 6;
     const TOP_K = 3;
     const MIN_SIMILARITY = 0.3;
-    const RUN_DELAYS_MS = [500, 500, 500, 1000, 800, 1000];
+    const RUN_DELAYS_MS = [400, 1400, 1200, 1400, 1600, 1600];
     const LANG_KEY = 'rag-sim-lang';
     const LANGS = ['pl', 'en'];
     const CHARS_PER_TOKEN = 4;   // rough estimate for the prompt size chip
     const PRODUCT_ICONS = { laptop: 'laptop', headphones: 'headphones', smartphone: 'smartphone', tv: 'monitor' };
+    const STAGES = [
+      { icon: 'database', tone: 'tone-stone' },
+      { icon: 'message-circle-question', tone: 'tone-blue' },
+      { icon: 'cpu', tone: 'tone-yellow' },
+      { icon: 'search', tone: 'tone-green' },
+      { icon: 'file-pen-line', tone: 'tone-grape' },
+      { icon: 'message-square', tone: 'tone-ink' },
+    ];
+    // Angle diagram geometry (SVG user units)
+    const ANGLE = { width: 340, height: 312, ox: 48, oy: 286, r: 250, dot: 10 };
 
     // Keyword patterns shared by both languages, so a Polish or English question
     // (and the Polish or English document text) lands on the same vector.
@@ -628,163 +625,143 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     const T = {
       pl: {
         pageTitle: 'Symulator RAG dla wsparcia technicznego',
-        title: 'Symulator systemu RAG dla wsparcia technicznego',
-        lead: 'Zobacz krok po kroku, jak system RAG (Retrieval-Augmented Generation) odpowiada na pytanie klienta: indeksuje dokumenty, zamienia pytanie na wektor, wyszukuje najbardziej podobne instrukcje i dopiero na ich podstawie generuje odpowiedź.',
-        langSwitch: 'Język',
-        secQuery: 'Pytanie klienta',
-        queryLabel: 'Pytanie do wsparcia technicznego',
-        queryPlaceholder: 'Wpisz pytanie do działu wsparcia…',
-        run: 'Uruchom symulację',
-        next: 'Następny krok',
-        restart: 'Od nowa',
-        reset: 'Reset',
+        appName: 'Symulator RAG',
+        introTitle: 'Jak RAG odpowiada na pytanie klienta',
+        introLead: 'Po lewej widać to, co widzi klient: zwykły czat. Po prawej, krok po kroku, to, co dzieje się za kulisami: dokumenty i pytanie zamieniają się w wektory, wyszukiwarka wybiera pasujące instrukcje, a model odpowiada tylko na ich podstawie i podaje linki do źródeł.',
+        introHint: 'Naciśnij „Dalej” (albo →), aby przejść o jeden krok. „Wyślij” w czacie przechodzi wszystkie kroki automatycznie.',
+        langSwitch: 'Język', back: 'Poprzedni krok', next: 'Dalej', restart: 'Od nowa', docs: 'Dokumenty', close: 'Zamknij',
+        stepsNav: 'Kroki', stepsCount: '{n} kroków',
+        chatTitle: 'Czat wsparcia TechX', chatView: 'widok klienta',
+        greeting: 'Dzień dobry! Opisz problem, a znajdę odpowiedź w instrukcjach.',
+        typing: 'Asystent pisze…',
         samplesLabel: 'Przykładowe pytania',
-        stepWord: 'Krok',
-        nextUp: 'Teraz',
-        finished: 'Gotowe – odpowiedź wygenerowana',
-        shortcutsLabel: 'Skróty:',
-        kRun: 'uruchom', kNext: 'następny krok', kReset: 'reset', kDocs: 'dokumenty', kLang: 'język',
-        secFlow: 'Przepływ RAG',
-        stage0: 'Baza wiedzy', stage1: 'Pytanie klienta', stage2: 'Model osadzeń', stage3: 'Wyszukiwarka', stage4: 'Budowanie promptu', stage5: 'Generator odpowiedzi',
-        stage0Desc: 'Krok 0: dokumenty zamieniane na wektory tym samym modelem co pytania',
-        stage1Desc: 'Krok 1: klient wysyła pytanie',
-        stage2Desc: 'Krok 2: pytanie zamieniane na wektor semantyczny',
-        stage4Desc: 'Krok 4: prompt systemowy + znalezione dokumenty + pytanie trafiają do modelu',
-        stage5Desc: 'Krok 5: odpowiedź oparta wyłącznie na znalezionych dokumentach',
-        roleSystem: 'Prompt systemowy',
-        roleUser: 'Wiadomość użytkownika',
-        systemFixed: 'stały',
-        systemPrompt: 'Jesteś asystentem wsparcia technicznego produktów TechX, SoundWave, PixelPlus i SmartView.\n\nZasady:\n1. Odpowiadaj wyłącznie na podstawie dokumentów z sekcji KONTEKST.\n2. Jeśli kontekst nie zawiera odpowiedzi, napisz, że nie masz takich informacji. Nie zgaduj i nie korzystaj z wiedzy spoza kontekstu.\n3. Tam, gdzie to możliwe, podawaj instrukcje krok po kroku.\n4. Wskaż dokumenty, z których korzystasz, np. [Dok. 1].\n5. Odpowiadaj w języku użytkownika.',
-        promptContext: 'KONTEKST',
-        promptQuestion: 'PYTANIE',
+        queryLabel: 'Pytanie do wsparcia technicznego',
+        queryPlaceholder: 'Napisz pytanie…',
+        send: 'Wyślij',
+        shortcuts: [['→', 'dalej'], ['←', 'wstecz'], ['R', 'od nowa'], ['D', 'dokumenty'], ['L', 'język']],
+        backLabel: 'Za kulisami', backStep: 'Za kulisami · krok {n} z {total}', backIntro: 'Za kulisami · start',
+        stepOf: 'krok {n} z {total}',
+        stageTitles: ['Osadzanie dokumentów', 'Pytanie klienta', 'Osadzanie pytania', 'Dopasowanie dokumentów', 'Budowanie promptu', 'Odpowiedź'],
+        stageTalk: [
+          'Zanim padnie jakiekolwiek pytanie, model osadzeń zamienia każdy dokument na wektor: 4 liczby mówiące, jak mocno tekst dotyczy laptopa, słuchawek, telefonu i telewizora. Wektory trafiają do bazy wektorowej.',
+          'Klient wpisuje pytanie w czacie zwykłym językiem. Dla systemu to na razie tylko tekst.',
+          'Ten sam model osadzeń zamienia pytanie na wektor o tych samych 4 wymiarach. Dzięki temu pytanie i dokumenty można ze sobą porównać.',
+          'Wyszukiwarka porównuje wektor pytania z wektorem każdego dokumentu. Miarą jest podobieństwo kosinusowe: im mniejszy kąt między wektorami, tym lepiej dokument pasuje. Do kontekstu trafiają maksymalnie {k} dokumenty powyżej progu {min}.',
+          'Składamy prompt: stałe zasady (prompt systemowy) + wybrane dokumenty w sekcji KONTEKST + pytanie klienta.',
+          'Model odpowiada wyłącznie na podstawie kontekstu i podaje linki do dokumentów, z których skorzystał.',
+        ],
+        stageShort: ['Dokumenty → wektory w bazie wektorowej', 'Klient pyta w czacie', 'Pytanie → wektor, tym samym modelem', 'Kąt między wektorami wybiera dokumenty', 'Zasady + dokumenty + pytanie', 'Odpowiedź z linkami do źródeł'],
+        colDoc: 'Dokument',
+        embedFlow: '{n} dokumentów → model osadzeń → baza wektorowa',
+        emptyQuery: '(puste pytanie)',
+        queryVector: 'Wektor pytania',
+        sameModel: 'Ten sam model i te same 4 wymiary co dokumenty.',
+        zeroVector: 'Wektor pytania jest pusty: pytanie nie dotyczy żadnego z 4 tematów, więc żaden dokument nie będzie do niego podobny.',
+        angleQuery: 'pytanie',
+        angleThreshold: 'próg {min}',
+        angleCaption: 'Każda kreska to wektor dokumentu, gruba to wektor pytania. Im mniejszy kąt, tym większe podobieństwo (cos 0° = 1, cos 90° = 0). Szare pole to strefa powyżej progu {min}.',
+        angleNoQuery: 'brak kierunku pytania',
+        legendIn: 'w kontekście', legendAbove: 'poza top {k}', legendBelow: 'poniżej progu',
+        rankQuery: 'Pytanie',
+        rankCaption: 'Kolor numeru jak w legendzie. Małe słupki to wektor (laptop, słuchawki, telefon, TV): podobny kształt = podobny temat.',
+        roleSystem: 'Prompt systemowy', roleUser: 'Wiadomość użytkownika', systemFixed: 'stały',
+        promptContext: 'KONTEKST', promptQuestion: 'PYTANIE',
         promptNoContext: '(brak dokumentów powyżej progu podobieństwa)',
         promptSimilarity: 'podobieństwo',
         promptDocsChip: '{n} dok. w kontekście',
         promptStats: 'ok. {tokens} tokenów',
-        waitPrompt: 'Czekam na dokumenty z wyszukiwarki…',
-        howPromptTitle: 'Budowanie promptu',
-        howPrompt: 'Znalezione dokumenty trafiają do sekcji KONTEKST, obok pytania. Prompt systemowy każe modelowi odpowiadać tylko na ich podstawie.',
-        livePrompt: 'Prompt zbudowany, dokumenty w kontekście: {n}.',
-        chipIdle: 'czeka', chipActive: 'teraz', chipDone: 'gotowe',
-        kbIndexed: 'zindeksowano', kbNotIndexed: 'brak indeksu',
-        notIndexed: 'nie zindeksowano',
-        emptyQuery: '(puste pytanie)',
-        waitEmbed: 'Czekam, aż pytanie trafi do modelu…',
-        queryVector: 'Wektor zapytania',
-        waitRetrieve: 'Czekam na wektor zapytania…',
-        retrieveFoot: 'Krok 3: podobieństwo kosinusowe, próg {min}, maks. {k} dokumenty',
-        hitsMeta: '{n} z {total} dokumentów powyżej progu {min}',
-        noHits: 'Żaden dokument nie przekroczył progu podobieństwa.',
+        sourcesTitle: 'Źródła',
+        noSources: 'Brak źródeł: kontekst był pusty.',
         docShort: 'Dok.',
-        waitAnswer: 'Czekam na wyniki wyszukiwania…',
-        sources: 'Źródła:',
-        none: 'W bazie wiedzy nie ma dokumentów pasujących do tego pytania, więc system nie odpowie. Lepiej przyznać się do braku danych niż zgadywać.',
-        combineIntro: 'Na podstawie dostępnych informacji:',
+        drawerTitle: 'Dokumenty w bazie wiedzy',
+        vector: 'Wektor',
+        notEmbedded: 'jeszcze nie osadzony',
+        simToQuery: 'Podobieństwo do pytania: {v}',
+        liveEmbedded: 'Osadzono {n} dokumentów.',
+        liveAsked: 'Klient wysłał pytanie.',
+        liveQueryEmbedded: 'Pytanie zamienione na wektor.',
+        liveMatched: 'Wybrano dokumenty do kontekstu: {n}.',
+        livePrompt: 'Prompt zbudowany.',
+        liveAnswered: 'Odpowiedź wysłana do klienta.',
+        liveReset: 'Symulacja od nowa.',
+        systemPrompt: 'Jesteś asystentem wsparcia technicznego produktów TechX, SoundWave, PixelPlus i SmartView.\n\nZasady:\n1. Odpowiadaj wyłącznie na podstawie dokumentów z sekcji KONTEKST.\n2. Jeśli kontekst nie zawiera odpowiedzi, napisz, że nie masz takich informacji. Nie zgaduj i nie korzystaj z wiedzy spoza kontekstu.\n3. Tam, gdzie to możliwe, podawaj instrukcje krok po kroku.\n4. Wskaż dokumenty, z których korzystasz, np. [Dok. 1].\n5. Odpowiadaj w języku użytkownika.',
         laptopFreeze: 'Jeśli laptop TechX Pro 13 zawiesił się lub nie reaguje:\n\n1. Przytrzymaj przycisk zasilania przez 10 sekund, aby wymusić wyłączenie.\n2. Odczekaj co najmniej 30 sekund przed ponownym włączeniem.\n3. Jeśli to nie pomoże, zresetuj SMC: przytrzymaj jednocześnie Shift+Control+Option i przycisk zasilania przez 10 sekund.\n\nJeśli problem wraca, może to oznaczać usterkę sprzętu wymagającą serwisu.',
         headphonesPair: 'Aby sparować słuchawki SoundWave X300 z nowym urządzeniem:\n\n1. Przytrzymaj przycisk wielofunkcyjny przez 5 sekund, aż dioda zacznie migać na niebiesko i czerwono.\n2. Włącz Bluetooth w swoim urządzeniu.\n3. Wybierz „SoundWave X300” z listy dostępnych urządzeń.\n4. Stałe niebieskie światło diody oznacza udane połączenie.\n\nJeśli połączenie się nie udaje, zresetuj słuchawki, przytrzymując oba przyciski głośności przez 10 sekund.',
         tvMirror: 'Aby wyświetlić ekran na telewizorze SmartView 4K:\n\n1. Upewnij się, że urządzenie i telewizor są w tej samej sieci Wi-Fi.\n2. Otwórz funkcję kopiowania ekranu (AirPlay w urządzeniach Apple, SmartView w Androidzie).\n3. Wybierz telewizor z listy dostępnych urządzeń.\n4. Na komputerze z Windows naciśnij Windows+K, aby otworzyć menu przesyłania.\n\nJeśli pojawią się problemy z połączeniem, uruchom ponownie urządzenie i telewizor.',
-        secDocs: 'Dokumenty w bazie wiedzy',
-        embedDocs: 'Zindeksuj dokumenty',
-        showDocs: 'Pokaż dokumenty', hideDocs: 'Ukryj dokumenty',
-        vector: 'Wektor',
+        none: 'W bazie wiedzy nie ma dokumentów pasujących do tego pytania, więc system nie odpowie. Lepiej przyznać się do braku danych niż zgadywać.',
+        combineIntro: 'Na podstawie dostępnych informacji:',
         dims: ['laptop', 'słuchawki', 'telefon', 'TV'],
         categories: { troubleshooting: 'problemy', maintenance: 'konserwacja', setup: 'konfiguracja', features: 'funkcje' },
-        secHow: 'Jak działa ten system',
-        how1Title: 'Indeksowanie dokumentów',
-        how1: 'System zamienia dokumenty wsparcia na wektory tym samym modelem, którego używa dla pytań, i zapisuje je w bazie wektorowej.',
-        how2Title: 'Zrozumienie pytania',
-        how2: 'Pytanie klienta zamienia się w wektor semantyczny: każda liczba mówi, jak mocno pytanie dotyczy danego tematu.',
-        how3Title: 'Wyszukiwanie dokumentów',
-        how3: 'System liczy podobieństwo wektora pytania do każdego dokumentu i bierze najbardziej podobne, powyżej progu.',
-        how4Title: 'Generowanie odpowiedzi',
-        how4: 'Model czyta zbudowany prompt i pisze konkretną odpowiedź, wskazując źródła. Gdy kontekst jest pusty, mówi, że nie ma danych.',
-        howNote: 'Jeśli pytanie nie dotyczy bazy wiedzy (np. pytanie o pogodę), żaden dokument nie przekroczy progu podobieństwa, a system powie, że nie ma danych, zamiast zgadywać.',
-        liveIndexed: 'Zindeksowano {n} dokumentów.',
-        liveQuery: 'Pytanie przyjęte.',
-        liveEmbedded: 'Pytanie zamienione na wektor.',
-        liveRetrieved: 'Znaleziono dokumenty: {n}.',
-        liveAnswered: 'Odpowiedź wygenerowana.',
-        liveReset: 'Symulacja zresetowana.',
       },
       en: {
         pageTitle: 'Tech Support RAG System Simulator',
-        title: 'Tech Support RAG System Simulator',
-        lead: 'Follow, step by step, how a RAG (Retrieval-Augmented Generation) system answers a customer question: it indexes the documents, turns the question into a vector, retrieves the most similar instructions and only then generates an answer from them.',
-        langSwitch: 'Language',
-        secQuery: 'Customer query',
+        appName: 'RAG simulator',
+        introTitle: 'How RAG answers a customer question',
+        introLead: 'On the left is what the customer sees: a plain chat. On the right, step by step, is what happens behind the scenes: documents and the question become vectors, the retriever picks the matching manuals, and the model answers from them only, with links to its sources.',
+        introHint: 'Press “Next” (or →) to go one step. “Send” in the chat runs all the steps automatically.',
+        langSwitch: 'Language', back: 'Previous step', next: 'Next', restart: 'Start over', docs: 'Documents', close: 'Close',
+        stepsNav: 'Steps', stepsCount: '{n} steps',
+        chatTitle: 'TechX support chat', chatView: 'customer view',
+        greeting: 'Hi! Describe the problem and I will find the answer in our manuals.',
+        typing: 'Assistant is typing…',
+        samplesLabel: 'Sample questions',
         queryLabel: 'Support question',
-        queryPlaceholder: 'Type your support question here…',
-        run: 'Run simulation',
-        next: 'Next step',
-        restart: 'Start over',
-        reset: 'Reset',
-        samplesLabel: 'Sample queries',
-        stepWord: 'Step',
-        nextUp: 'Now',
-        finished: 'Done – answer generated',
-        shortcutsLabel: 'Shortcuts:',
-        kRun: 'run', kNext: 'next step', kReset: 'reset', kDocs: 'documents', kLang: 'language',
-        secFlow: 'RAG pipeline',
-        stage0: 'Knowledge base', stage1: 'Customer query', stage2: 'Embedding model', stage3: 'Retriever', stage4: 'Prompt builder', stage5: 'Response generator',
-        stage0Desc: 'Step 0: documents embedded with the same model as the queries',
-        stage1Desc: 'Step 1: customer submits a support question',
-        stage2Desc: 'Step 2: convert the query to a semantic vector',
-        stage4Desc: 'Step 4: system prompt + retrieved documents + question go to the model',
-        stage5Desc: 'Step 5: answer grounded only in the retrieved documents',
-        roleSystem: 'System prompt',
-        roleUser: 'User message',
-        systemFixed: 'fixed',
-        systemPrompt: "You are a technical support assistant for TechX, SoundWave, PixelPlus and SmartView products.\n\nRules:\n1. Answer only from the documents in the CONTEXT section.\n2. If the context does not contain the answer, say you have no information about it. Do not guess and do not use knowledge from outside the context.\n3. Give step-by-step instructions where possible.\n4. Name the documents you used, e.g. [Doc 1].\n5. Reply in the user's language.",
-        promptContext: 'CONTEXT',
-        promptQuestion: 'QUESTION',
+        queryPlaceholder: 'Type your question…',
+        send: 'Send',
+        shortcuts: [['→', 'next'], ['←', 'back'], ['R', 'start over'], ['D', 'documents'], ['L', 'language']],
+        backLabel: 'Behind the scenes', backStep: 'Behind the scenes · step {n} of {total}', backIntro: 'Behind the scenes · start',
+        stepOf: 'step {n} of {total}',
+        stageTitles: ['Embedding documents', 'Customer question', 'Embedding the question', 'Matching documents', 'Prompt building', 'Answer'],
+        stageTalk: [
+          'Before anyone asks anything, the embedding model turns every document into a vector: 4 numbers saying how strongly the text is about a laptop, headphones, a phone and a TV. The vectors go into a vector database.',
+          'The customer types a question in the chat in plain language. To the system it is just text so far.',
+          'The same embedding model turns the question into a vector with the same 4 dimensions, so the question and the documents can be compared.',
+          'The retriever compares the question vector with every document vector using cosine similarity: the smaller the angle between two vectors, the better the document matches. Up to {k} documents above the {min} threshold go into the context.',
+          'We assemble the prompt: fixed rules (the system prompt) + the selected documents in a CONTEXT section + the customer question.',
+          'The model answers from the context only and links to the documents it used.',
+        ],
+        stageShort: ['Documents → vectors in a vector database', 'The customer asks in the chat', 'Question → vector, same model', 'The angle between vectors picks documents', 'Rules + documents + question', 'Answer with links to sources'],
+        colDoc: 'Document',
+        embedFlow: '{n} documents → embedding model → vector database',
+        emptyQuery: '(empty question)',
+        queryVector: 'Question vector',
+        sameModel: 'Same model and the same 4 dimensions as the documents.',
+        zeroVector: 'The question vector is empty: the question is about none of the 4 topics, so no document will be similar to it.',
+        angleQuery: 'question',
+        angleThreshold: 'threshold {min}',
+        angleCaption: 'Each thin line is a document vector, the thick one is the question vector. The smaller the angle, the higher the similarity (cos 0° = 1, cos 90° = 0). The grey area is the zone above the {min} threshold.',
+        angleNoQuery: 'question has no direction',
+        legendIn: 'in context', legendAbove: 'outside top {k}', legendBelow: 'below threshold',
+        rankQuery: 'Question',
+        rankCaption: 'Number colours follow the legend. The small bars are the vector (laptop, headphones, phone, TV): a similar shape means a similar topic.',
+        roleSystem: 'System prompt', roleUser: 'User message', systemFixed: 'fixed',
+        promptContext: 'CONTEXT', promptQuestion: 'QUESTION',
         promptNoContext: '(no documents above the similarity threshold)',
         promptSimilarity: 'similarity',
         promptDocsChip: '{n} docs in context',
         promptStats: '~{tokens} tokens',
-        waitPrompt: 'Waiting for documents from the retriever…',
-        howPromptTitle: 'Prompt building',
-        howPrompt: 'The retrieved documents go into the CONTEXT section next to the question. The system prompt tells the model to answer from them only.',
-        livePrompt: 'Prompt built, documents in context: {n}.',
-        chipIdle: 'waiting', chipActive: 'now', chipDone: 'done',
-        kbIndexed: 'indexed', kbNotIndexed: 'not indexed',
-        notIndexed: 'not indexed',
-        emptyQuery: '(empty query)',
-        waitEmbed: 'Waiting for the query to process…',
-        queryVector: 'Query vector',
-        waitRetrieve: 'Waiting for the query vector…',
-        retrieveFoot: 'Step 3: cosine similarity, threshold {min}, up to {k} documents',
-        hitsMeta: '{n} of {total} documents above the {min} threshold',
-        noHits: 'No document passed the similarity threshold.',
+        sourcesTitle: 'Sources',
+        noSources: 'No sources: the context was empty.',
         docShort: 'Doc',
-        waitAnswer: 'Waiting for retrieval…',
-        sources: 'Sources:',
-        none: 'The knowledge base has no documents that match this question, so the system will not answer it. Admitting missing data beats guessing.',
-        combineIntro: 'Based on the information I have:',
+        drawerTitle: 'Knowledge base documents',
+        vector: 'Vector',
+        notEmbedded: 'not embedded yet',
+        simToQuery: 'Similarity to the question: {v}',
+        liveEmbedded: 'Embedded {n} documents.',
+        liveAsked: 'The customer sent the question.',
+        liveQueryEmbedded: 'Question converted to a vector.',
+        liveMatched: 'Documents selected for the context: {n}.',
+        livePrompt: 'Prompt built.',
+        liveAnswered: 'Answer sent to the customer.',
+        liveReset: 'Simulation restarted.',
+        systemPrompt: "You are a technical support assistant for TechX, SoundWave, PixelPlus and SmartView products.\n\nRules:\n1. Answer only from the documents in the CONTEXT section.\n2. If the context does not contain the answer, say you have no information about it. Do not guess and do not use knowledge from outside the context.\n3. Give step-by-step instructions where possible.\n4. Name the documents you used, e.g. [Doc 1].\n5. Reply in the user's language.",
         laptopFreeze: "If your TechX Pro 13 laptop is frozen or unresponsive, you should:\n\n1. Press and hold the power button for 10 seconds to force a shutdown\n2. Wait at least 30 seconds before turning it back on\n3. If this doesn't resolve the issue, try resetting the SMC by holding Shift+Control+Option and the power button simultaneously for 10 seconds\n\nIf the problem persists, it might indicate a more serious hardware issue requiring service.",
         headphonesPair: "To pair your SoundWave X300 headphones with a new device:\n\n1. Press and hold the multifunction button for 5 seconds until the LED flashes blue and red alternately\n2. Enable Bluetooth on your device\n3. Select 'SoundWave X300' from the list of available devices\n4. The LED will turn solid blue when successfully connected\n\nIf you're having trouble connecting, try resetting your headphones by holding both volume buttons for 10 seconds.",
         tvMirror: "To mirror your screen to a SmartView 4K TV:\n\n1. Make sure both your device and TV are connected to the same WiFi network\n2. On your device, open the screen mirroring function (AirPlay on Apple, SmartView on Android)\n3. Select your TV from the list of available devices\n4. For Windows PC, press Windows+K to open the casting menu\n\nIf you're having connection issues, try restarting both your device and TV.",
-        secDocs: 'Knowledge base documents',
-        embedDocs: 'Embed documents',
-        showDocs: 'Show documents', hideDocs: 'Hide documents',
-        vector: 'Vector',
+        none: 'The knowledge base has no documents that match this question, so the system will not answer it. Admitting missing data beats guessing.',
+        combineIntro: 'Based on the information I have:',
         dims: ['laptop', 'headphones', 'phone', 'TV'],
         categories: { troubleshooting: 'troubleshooting', maintenance: 'maintenance', setup: 'setup', features: 'features' },
-        secHow: 'How this RAG system works',
-        how1Title: 'Document indexing',
-        how1: 'The system embeds the support documents with the same vectoriser it uses for user queries and stores them in a vector database.',
-        how2Title: 'Query understanding',
-        how2: "The customer's question becomes a semantic vector: each number says how strongly the question is about a given topic.",
-        how3Title: 'Document retrieval',
-        how3: 'The system scores the query vector against every document and keeps the most similar ones above a threshold.',
-        how4Title: 'Response generation',
-        how4: 'The model reads the assembled prompt and writes a specific answer, citing its sources. With an empty context it says it has no data.',
-        howNote: 'If the question is off-topic (for example, a weather question), no document passes the similarity threshold and the system says it has no data instead of guessing.',
-        liveIndexed: 'Indexed {n} documents.',
-        liveQuery: 'Query accepted.',
-        liveEmbedded: 'Query converted to a vector.',
-        liveRetrieved: 'Documents retrieved: {n}.',
-        liveAnswered: 'Answer generated.',
-        liveReset: 'Simulation reset.',
       },
     };
 
@@ -792,50 +769,44 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     const savedLang = localStorage.getItem(LANG_KEY);
     const state = {
       lang: LANGS.includes(savedLang) ? savedLang : 'pl',
-      step: 0,             // 0..4 = stage about to run, 5 = finished
+      done: 0,             // completed stages, 0..STEP_COUNT
+      view: -1,            // stage shown behind the scenes, -1 = intro
       running: false,
       query: '',
-      docVectors: null,    // { [docId]: number[] } once indexed
+      docVectors: null,    // { [docId]: number[] } once embedded
       queryVector: null,
       scores: [],          // every doc with its similarity, sorted desc
       retrieved: [],       // docs above MIN_SIMILARITY, top K
-      promptBuilt: false,
       answer: null,        // { kind: 'none' } | { kind: 'template', id, docIds } | { kind: 'combine', docIds }
-      docsOpen: true,
+      focusDoc: null,      // doc highlighted in the drawer
     };
     state.query = SAMPLES[state.lang][0];
+    let stageKey = '';     // re-render the stage card only when this changes
+    let runToken = 0;      // cancels an auto-run on reset
+    let chatKey = '';      // re-render the chat log only when this changes
 
     // ─── DOM refs ───
     const $ = id => document.getElementById(id);
     const queryInput = $('queryInput');
-    const runButton = $('runButton');
+    const chatForm = $('chatForm');
+    const sendButton = $('sendButton');
+    const chatLog = $('chatLog');
+    const samplesEl = $('samples');
+    const shortcutsEl = $('shortcuts');
+    const backButton = $('backButton');
     const nextButton = $('nextButton');
     const nextLabel = $('nextLabel');
     const resetButton = $('resetButton');
-    const samplesEl = $('samples');
-    const progressLabel = $('progressLabel');
+    const docsButton = $('docsButton');
+    const backLabel = $('backLabel');
+    const stepperEl = $('stepper');
+    const stageCard = $('stageCard');
     const progressBar = $('progressBar');
     const progressFill = $('progressFill');
-    const progressStatus = $('progressStatus');
-    const shortcutsEl = $('shortcuts');
     const liveEl = $('live');
-    const kbBody = $('kbBody');
-    const kbStatus = $('kbStatus');
-    const queryBody = $('queryBody');
-    const embedBody = $('embedBody');
-    const retrieveBody = $('retrieveBody');
-    const retrieveFoot = $('retrieveFoot');
-    const systemPromptText = $('systemPromptText');
-    const userPromptChip = $('userPromptChip');
-    const userPromptBody = $('userPromptBody');
-    const promptStats = $('promptStats');
-    const answerBody = $('answerBody');
-    const answerSources = $('answerSources');
-    const embedDocsButton = $('embedDocsButton');
-    const toggleDocsButton = $('toggleDocsButton');
-    const toggleDocsLabel = $('toggleDocsLabel');
-    const docGrid = $('docGrid');
-    const stageEls = [...document.querySelectorAll('.stage')];
+    const drawer = $('drawer');
+    const drawerBody = $('drawerBody');
+    const drawerClose = $('drawerClose');
     const langButtons = [...document.querySelectorAll('.edu-seg button')];
 
     // ─── Helpers ───
@@ -844,11 +815,14 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       if (vars && typeof s === 'string') Object.entries(vars).forEach(([k, v]) => { s = s.replaceAll('{' + k + '}', v); });
       return s;
     }
+    const fill = (s, vars) => Object.entries(vars).reduce((acc, [k, v]) => acc.replaceAll('{' + k + '}', v), s);
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const icon = (name, cls = 'ic') => `<i data-lucide="${name}" class="${cls}" aria-hidden="true"></i>`;
-    const fmt = v => v.toFixed(3);
+    const fmt2 = v => v.toFixed(2);
     const sleep = ms => new Promise(r => setTimeout(r, ms));
     const docById = id => DOCS.find(d => d.id === id);
+    const stageTitle = i => t('stageTitles')[i];
+    const scoreOf = id => state.scores.find(s => s.id === id);
 
     function embed(text) {
       const lower = text.toLowerCase();
@@ -864,8 +838,8 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       return ma && mb ? dot / (Math.sqrt(ma) * Math.sqrt(mb)) : 0;
     }
 
-    function indexDocs() {
-      // Index the English source text; the Polish translation maps to the same vector.
+    function embedDocs() {
+      // Embed the English source text; the Polish translation maps to the same vector.
       state.docVectors = Object.fromEntries(DOCS.map(d => [d.id, embed(d.text.en)]));
     }
 
@@ -890,55 +864,76 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       const context = state.retrieved.length
         ? state.retrieved.map(r => {
             const d = docById(r.id);
-            return `[${t('docShort')} ${d.id}] ${d.title[state.lang]} (${t('promptSimilarity')} ${r.similarity.toFixed(2)})\n${d.text[state.lang]}`;
+            return `[${t('docShort')} ${d.id}] ${d.title[state.lang]} (${t('promptSimilarity')} ${fmt2(r.similarity)})\n${d.text[state.lang]}`;
           }).join('\n\n')
         : t('promptNoContext');
       return `${t('promptContext')}:\n${context}\n\n${t('promptQuestion')}:\n${state.query.trim() || t('emptyQuery')}`;
     }
 
-    function clearPipeline() {
+    function clearQueryResults() {
       state.queryVector = null;
       state.scores = [];
       state.retrieved = [];
-      state.promptBuilt = false;
       state.answer = null;
     }
 
-    // The query changed: drop everything computed from the old one
+    // The question changed: drop everything computed from the old one, keep the embedded docs
     function invalidateQuery() {
-      clearPipeline();
-      if (state.step > 1) state.step = 1;
+      clearQueryResults();
+      if (state.done > 1) state.done = 1;
+      if (state.view > state.done - 1) state.view = state.done - 1;
     }
 
     function announce(key, vars) { liveEl.textContent = t(key, vars); }
 
     const STEP_ACTIONS = [
-      () => { indexDocs(); announce('liveIndexed', { n: DOCS.length }); },
-      () => announce('liveQuery'),
-      () => { state.queryVector = embed(state.query); announce('liveEmbedded'); },
-      () => { retrieveDocs(); announce('liveRetrieved', { n: state.retrieved.length }); },
-      () => { state.promptBuilt = true; announce('livePrompt', { n: state.retrieved.length }); },
+      () => { embedDocs(); announce('liveEmbedded', { n: DOCS.length }); },
+      () => announce('liveAsked'),
+      () => { state.queryVector = embed(state.query); announce('liveQueryEmbedded'); },
+      () => { retrieveDocs(); announce('liveMatched', { n: state.retrieved.length }); },
+      () => announce('livePrompt'),
       () => { state.answer = generateAnswer(); announce('liveAnswered'); },
     ];
 
-    function advance() {
+    function completeNextStage() {
+      STEP_ACTIONS[state.done]();
+      state.done++;
+      state.view = state.done - 1;
+    }
+
+    // → : show the next finished stage, or run the next one
+    function forward() {
       if (state.running) return;
-      if (state.step === STEP_COUNT) { resetSimulation(); return; }
-      STEP_ACTIONS[state.step]();
-      state.step++;
+      if (state.view < state.done - 1) state.view++;
+      else if (state.done < STEP_COUNT) completeNextStage();
+      else return;
       render();
     }
 
-    async function runSimulation() {
+    function backward() {
+      if (state.running || state.view < 0) return;
+      state.view--;
+      render();
+    }
+
+    function goTo(view) {
+      if (state.running || view < -1 || view > state.done - 1) return;
+      state.view = view;
+      render();
+    }
+
+    async function runAll() {
       if (state.running) return;
+      const token = ++runToken;
       state.running = true;
-      clearPipeline();
-      state.step = 0;
+      clearQueryResults();
+      state.done = 0;
+      state.view = -1;
       render();
       for (let i = 0; i < STEP_COUNT; i++) {
         await sleep(RUN_DELAYS_MS[i]);
-        STEP_ACTIONS[i]();
-        state.step = i + 1;
+        if (token !== runToken) return;
+        completeNextStage();
         render();
       }
       state.running = false;
@@ -946,9 +941,11 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     }
 
     function resetSimulation() {
-      if (state.running) return;
-      clearPipeline();
-      state.step = 0;
+      runToken++;
+      state.running = false;
+      clearQueryResults();
+      state.done = 0;
+      state.view = -1;
       announce('liveReset');
       render();
     }
@@ -973,11 +970,143 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       }
       applyStaticText();
       render();
+      if (drawer.open) renderDrawer();
     }
 
-    function toggleDocs() {
-      state.docsOpen = !state.docsOpen;
-      render();
+    function openDocs(docId = null) {
+      state.focusDoc = docId;
+      renderDrawer();
+      if (!drawer.open) drawer.showModal();
+      const target = docId && $('doc-' + docId);
+      if (target) target.scrollIntoView({ block: 'start' });
+      else drawerBody.scrollTop = 0;
+    }
+
+    // ─── Render: pieces ───
+    function fingerprint(v) {
+      return `<span class="fp" aria-hidden="true">${v.map(x => `<b><i style="height:${(x * 100).toFixed(0)}%"></i></b>`).join('')}</span>`;
+    }
+
+    function cellBar(x) {
+      return `<span class="cell"><span class="track"><span style="width:${(x * 100).toFixed(1)}%"></span></span>${fmt2(x)}</span>`;
+    }
+
+    function docLink(id, withSim) {
+      const d = docById(id);
+      const s = withSim && scoreOf(id);
+      return `<a class="doc-link" href="#doc-${id}" data-doc-link="${id}">${icon('file-text')}<span>${esc(t('docShort'))} ${id} – ${esc(d.title[state.lang])}</span>${s ? `<span class="sim">${fmt2(s.similarity)}</span>` : ''}</a>`;
+    }
+
+    function answerText(a) {
+      if (a.kind === 'template') return t(a.id);
+      return [t('combineIntro'), ...a.docIds.map(id => `${t('docShort')} ${id} – ${docById(id).title[state.lang]}:\n${docById(id).text[state.lang]}`)].join('\n\n');
+    }
+
+    function angleSvg() {
+      const { width, height, ox, oy, r, dot } = ANGLE;
+      const pt = (theta, rad) => [ox + rad * Math.cos(theta), oy - rad * Math.sin(theta)];
+      const thrTheta = Math.acos(MIN_SIMILARITY);
+      const [tx, ty] = pt(thrTheta, r);
+      const hasQuery = state.queryVector.some(x => x > 0);
+      const hit = new Set(state.retrieved.map(x => x.id));
+      const parts = [];
+      parts.push(`<path class="cone" d="M${ox},${oy} L${ox + r},${oy} A${r},${r} 0 0 0 ${tx.toFixed(1)},${ty.toFixed(1)} Z"/>`);
+      parts.push(`<path class="arc" d="M${ox + r},${oy} A${r},${r} 0 0 0 ${ox},${oy - r}"/>`);
+      parts.push(`<line class="axis" x1="${ox}" y1="${oy}" x2="${ox}" y2="${oy - r}"/>`);
+      parts.push(`<line class="thr" x1="${ox}" y1="${oy}" x2="${tx.toFixed(1)}" y2="${ty.toFixed(1)}"/>`);
+      parts.push(`<text x="${(tx + 6).toFixed(1)}" y="${(ty - 4).toFixed(1)}" class="lbl-muted">${esc(t('angleThreshold', { min: fmt2(MIN_SIMILARITY) }))}</text>`);
+      parts.push(`<text x="${ox - 8}" y="${oy + 18}" class="lbl-muted">0°</text><text x="${ox - 44}" y="${oy - r + 4}" class="lbl-muted">90°</text>`);
+      if (hasQuery) {
+        parts.push(`<line class="q-ray" x1="${ox}" y1="${oy}" x2="${ox + r - 6}" y2="${oy}"/>`);
+        parts.push(`<path class="q-head" d="M${ox + r + 6},${oy} l-14,-8 v16 z"/>`);
+        parts.push(`<text x="${ox + r - 70}" y="${oy + 22}">${esc(t('angleQuery'))}</text>`);
+      } else {
+        parts.push(`<text x="${ox + 60}" y="${oy + 22}" class="lbl-muted">${esc(t('angleNoQuery'))}</text>`);
+      }
+      const dots = state.scores.map((s, rank) => {
+        const theta = Math.acos(Math.min(1, Math.max(0, s.similarity)));
+        const [x, y] = pt(theta, r * (0.36 + rank * 0.088));
+        const cls = hit.has(s.id) ? 'in' : s.similarity >= MIN_SIMILARITY ? 'above' : 'below';
+        return { x, y, cls, id: s.id };
+      });
+      dots.forEach(d => parts.push(`<line class="d-ray${d.cls === 'in' ? ' in' : ''}" x1="${ox}" y1="${oy}" x2="${d.x.toFixed(1)}" y2="${d.y.toFixed(1)}"/>`));
+      dots.slice().reverse().forEach(d => parts.push(`<g class="dot ${d.cls}" data-doc-id="${d.id}"><circle cx="${d.x.toFixed(1)}" cy="${d.y.toFixed(1)}" r="${dot}"/><text x="${d.x.toFixed(1)}" y="${d.y.toFixed(1)}">${d.id}</text></g>`));
+      return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(t('angleCaption', { min: fmt2(MIN_SIMILARITY) }))}">${parts.join('')}</svg>`;
+    }
+
+    // ─── Render: stage bodies ───
+    const STAGE_BODY = [
+      () => `<p class="over-mono">${esc(t('embedFlow', { n: DOCS.length }))}</p>
+        <div class="emb reveal">
+          <div class="emb-row head"><span>${esc(t('colDoc'))}</span><span></span>${t('dims').map(d => `<span>${esc(d)}</span>`).join('')}</div>
+          ${DOCS.map((d, i) => `<div class="emb-row" style="--i:${i + 1}" data-doc-id="${d.id}">
+            <span class="emb-doc">${icon(PRODUCT_ICONS[d.product])}<span><b>${esc(t('docShort'))} ${d.id} · ${esc(d.title[state.lang])}</b><small>${esc(d.text[state.lang])}</small></span></span>
+            <span class="emb-arrow">${icon('arrow-right')}</span>
+            ${state.docVectors[d.id].map(cellBar).join('')}
+          </div>`).join('')}
+        </div>`,
+
+      () => `<p class="bubble"></p>`,
+
+      () => {
+        const v = state.queryVector;
+        const zero = !v.some(x => x > 0);
+        return `<p class="over-mono">${esc(t('queryVector'))}</p>
+          <div class="vec reveal">${v.map((x, i) => `<div class="vec-row" style="--i:${i}"><span>${esc(t('dims')[i])}</span><span class="track"><span style="width:${(x * 100).toFixed(1)}%"></span></span><span class="v">${fmt2(x)}</span></div>`).join('')}</div>
+          <p class="raw">[${v.map(x => x.toFixed(3)).join(', ')}]</p>
+          ${zero ? `<div class="callout tone-blue edu-block">${icon('info')}<p>${esc(t('zeroVector'))}</p></div>` : `<p class="talk">${esc(t('sameModel'))}</p>`}`;
+      },
+
+      () => {
+        const hit = new Set(state.retrieved.map(x => x.id));
+        const k = TOP_K, min = fmt2(MIN_SIMILARITY);
+        return `<div class="match">
+          <div class="angle">${angleSvg()}
+            <div class="legend"><span class="edu-chip chip-green">${esc(t('legendIn'))}</span><span class="edu-chip chip-above">${esc(t('legendAbove', { k }))}</span><span class="edu-chip chip-below">${esc(t('legendBelow'))}</span></div>
+            <p class="angle-cap">${esc(t('angleCaption', { min }))}</p>
+          </div>
+          <div>
+            <div class="rank reveal">
+              <div class="rank-row query"><span class="rank-title">${icon('message-circle-question')}<span>${esc(t('rankQuery'))}</span></span>${fingerprint(state.queryVector)}<span></span><span></span></div>
+              ${state.scores.map((s, i) => {
+                const d = docById(s.id);
+                const cls = hit.has(s.id) ? 'in' : s.similarity >= MIN_SIMILARITY ? 'above' : 'below';
+                const status = { in: t('legendIn'), above: t('legendAbove', { k }), below: t('legendBelow') }[cls];
+                return `<div class="rank-row ${cls}" style="--i:${i + 1}" data-doc-id="${s.id}" data-similarity="${s.similarity.toFixed(4)}">
+                  <span class="edu-chip ${cls === 'in' ? 'chip-green' : 'chip-' + cls}" title="${esc(status)}">${esc(t('docShort'))} ${s.id}<span class="sr-only"> – ${esc(status)}</span></span>
+                  <span class="rank-title" title="${esc(d.title[state.lang])}">${esc(d.title[state.lang])}</span>
+                  ${fingerprint(state.docVectors[s.id])}<span class="track"><span style="width:${(s.similarity * 100).toFixed(1)}%"></span></span><span class="v">${fmt2(s.similarity)}</span>
+                </div>`;
+              }).join('')}
+            </div>
+            <p class="angle-cap">${esc(t('rankCaption'))}</p>
+          </div>
+        </div>`;
+      },
+
+      () => {
+        const userPrompt = buildUserPrompt();
+        const tokens = Math.ceil((t('systemPrompt').length + userPrompt.length) / CHARS_PER_TOKEN);
+        return `<div class="prompt-grid" data-prompt-docs="${state.retrieved.map(r => r.id).join(',')}">
+            <div class="msg" data-role="system"><div class="msg-head"><span class="over-mono">${esc(t('roleSystem'))}</span><span class="edu-chip chip-stone">${esc(t('systemFixed'))}</span></div><p class="msg-text" id="systemPromptText"></p></div>
+            <div class="msg" data-role="user"><div class="msg-head"><span class="over-mono">${esc(t('roleUser'))}</span><span class="edu-chip chip-stone">${esc(t('promptDocsChip', { n: state.retrieved.length }))}</span></div><p class="msg-text" id="userPromptText"></p></div>
+          </div>
+          <div><span class="edu-chip chip-stone" id="promptStats">${esc(t('promptStats', { tokens }))}</span></div>`;
+      },
+
+      () => {
+        const a = state.answer;
+        if (a.kind === 'none') return `<div class="callout tone-blue edu-block">${icon('info')}<p>${esc(t('none'))}</p></div><p class="talk">${esc(t('noSources'))}</p>`;
+        return `<p class="answer-text" id="answerStageText"></p>
+          <div class="answer-src"><p class="over-mono">${esc(t('sourcesTitle'))}</p>${a.docIds.map(id => docLink(id, true)).join('')}</div>`;
+      },
+    ];
+
+    // Text that comes from user input or long strings goes in with textContent
+    function fillStageText(i) {
+      if (i === 1) stageCard.querySelector('.bubble').textContent = state.query.trim() || t('emptyQuery');
+      if (i === 4) { $('systemPromptText').textContent = t('systemPrompt'); $('userPromptText').textContent = buildUserPrompt(); }
+      if (i === 5 && state.answer.kind !== 'none') $('answerStageText').textContent = answerText(state.answer);
     }
 
     // ─── Render ───
@@ -987,189 +1116,149 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
       document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
-      shortcutsEl.innerHTML = `<span>${esc(t('shortcutsLabel'))}</span>` +
-        [['Enter', 'kRun'], ['N', 'kNext'], ['R', 'kReset'], ['D', 'kDocs'], ['L', 'kLang']]
-          .map(([k, label]) => `<span><kbd>${k}</kbd> ${esc(t(label))}</span>`).join('');
+      shortcutsEl.innerHTML = t('shortcuts').map(([k, label]) => `<span><kbd>${esc(k)}</kbd> ${esc(label)}</span>`).join('');
+      stageKey = '';
+      chatKey = '';
     }
-
-    function vectorBars(v) {
-      const dims = t('dims');
-      return `<div class="vec">${v.map((x, i) =>
-        `<div class="vec-row"><span>${esc(dims[i])}</span><span class="track"><span style="width:${(x * 100).toFixed(1)}%"></span></span><span class="val">${x.toFixed(2)}</span></div>`
-      ).join('')}</div>`;
-    }
-
-    const rawVector = v => `[${v.map(fmt).join(', ')}]`;
 
     function renderControls() {
-      document.body.dataset.step = state.step;
-      document.body.dataset.running = state.running;
-      document.body.dataset.indexed = !!state.docVectors;
-      document.body.dataset.lang = state.lang;
-      langButtons.forEach(b => {
-        const on = b.dataset.lang === state.lang;
-        b.classList.toggle('active', on);
-        b.setAttribute('aria-pressed', on);
+      const b = document.body.dataset;
+      b.done = state.done; b.view = state.view; b.running = state.running; b.lang = state.lang;
+      b.indexed = !!state.docVectors;
+      langButtons.forEach(btn => {
+        const on = btn.dataset.lang === state.lang;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-pressed', on);
       });
       queryInput.readOnly = state.running;
-      runButton.disabled = state.running;
-      nextButton.disabled = state.running;
-      resetButton.disabled = state.running;
-      embedDocsButton.disabled = state.running;
-      nextLabel.textContent = state.step === STEP_COUNT ? t('restart') : t('next');
-
+      sendButton.disabled = state.running;
+      backButton.disabled = state.running || state.view < 0;
+      nextButton.disabled = state.running || (state.done === STEP_COUNT && state.view === STEP_COUNT - 1);
+      nextLabel.textContent = t('next');
       samplesEl.innerHTML = SAMPLES[state.lang].map((q, i) =>
         `<button type="button" class="sample" data-sample="${i}" aria-pressed="${q === state.query}"${state.running ? ' disabled' : ''}>${esc(q)}</button>`
       ).join('');
-
-      progressLabel.textContent = `${t('stepWord')} ${state.step}/${STEP_COUNT}`;
-      progressFill.style.width = (state.step / STEP_COUNT * 100) + '%';
+      progressFill.style.width = (state.done / STEP_COUNT * 100) + '%';
       progressBar.setAttribute('aria-valuemax', STEP_COUNT);
-      progressBar.setAttribute('aria-valuenow', state.step);
-      progressStatus.textContent = state.step < STEP_COUNT ? `${t('nextUp')}: ${t('stage' + state.step)}` : t('finished');
+      progressBar.setAttribute('aria-valuenow', state.done);
     }
 
-    function renderStages() {
-      stageEls.forEach(el => {
-        const i = Number(el.dataset.stage);
-        const s = i < state.step ? 'done' : i === state.step ? 'active' : 'idle';
-        el.dataset.state = s;
-        const chip = el.querySelector('[data-chip]');
-        chip.className = 'edu-chip ' + { idle: 'chip-stone', active: 'chip-yellow', done: 'chip-green' }[s];
-        chip.textContent = t({ idle: 'chipIdle', active: 'chipActive', done: 'chipDone' }[s]);
+    function renderChat() {
+      const asked = state.done >= 2;
+      const answered = state.done >= STEP_COUNT;
+      document.body.dataset.chat = answered ? 'answered' : asked ? 'typing' : 'empty';
+      const key = [asked, answered, state.lang, state.query].join('|');
+      if (key === chatKey) return;
+      chatKey = key;
+      const parts = [`<div class="msg-bot"><p>${esc(t('greeting'))}</p></div>`];
+      if (asked) parts.push(`<div class="msg-me"></div>`);
+      if (asked && !answered) parts.push(`<div class="typing" role="img" aria-label="${esc(t('typing'))}"><i></i><i></i><i></i></div>`);
+      if (answered) {
+        const a = state.answer;
+        parts.push(a.kind === 'none'
+          ? `<div class="msg-bot" data-answer-kind="none"><p>${esc(t('none'))}</p></div>`
+          : `<div class="msg-bot" data-answer-kind="${a.kind}"><p class="chat-answer"></p><div class="sources"><span class="edu-overline">${esc(t('sourcesTitle'))}</span>${a.docIds.map(id => docLink(id, false)).join('')}</div></div>`);
+      }
+      chatLog.innerHTML = parts.join('');
+      const me = chatLog.querySelector('.msg-me');
+      if (me) me.textContent = state.query.trim() || t('emptyQuery');
+      const ans = chatLog.querySelector('.chat-answer');
+      if (ans) ans.textContent = answerText(state.answer);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function renderStepper() {
+      backLabel.textContent = state.view < 0 ? t('backIntro') : t('backStep', { n: state.view + 1, total: STEP_COUNT });
+      const items = [`<button type="button" class="step-btn" data-goto="-1" aria-label="${esc(t('backIntro'))}"${state.view === -1 ? ' aria-current="step"' : ''}${state.running ? ' disabled' : ''}><span class="badge tone-stone">${icon('house')}</span></button>`];
+      STAGES.forEach((s, i) => {
+        const done = i < state.done;
+        const current = i === state.view;
+        items.push(`<span class="step-sep" aria-hidden="true"></span><button type="button" class="step-btn" data-goto="${i}" data-state="${current ? 'current' : done ? 'done' : 'todo'}" aria-label="${esc(stageTitle(i))}"${current ? ' aria-current="step"' : ''}${!done || state.running ? ' disabled' : ''}><span class="badge ${done ? s.tone : 'tone-off'}">${icon(s.icon)}</span>${current ? `<span class="lbl">${esc(stageTitle(i))}</span>` : ''}</button>`);
       });
-
-      // Knowledge base
-      const hitRank = Object.fromEntries(state.retrieved.map((r, i) => [r.id, i + 1]));
-      kbStatus.textContent = state.docVectors ? `${DOCS.length} · ${t('kbIndexed')}` : t('kbNotIndexed');
-      kbBody.innerHTML = `<div class="kb-grid">${DOCS.map(d => `
-        <div class="kb-doc" data-doc-id="${d.id}" data-hit="${!!hitRank[d.id]}">
-          <div class="kb-doc-top">
-            <span class="kb-doc-title">${icon(PRODUCT_ICONS[d.product])}<span>${esc(d.title[state.lang])}</span></span>
-            ${hitRank[d.id] ? `<span class="edu-chip chip-yellow">#${hitRank[d.id]}</span>` : ''}
-          </div>
-          <span class="kb-doc-vec">${state.docVectors ? rawVector(state.docVectors[d.id]) : esc(t('notIndexed'))}</span>
-        </div>`).join('')}</div>`;
-
-      // Query
-      queryBody.innerHTML = `<div class="well"></div>`;
-      queryBody.firstChild.textContent = state.query.trim() ? state.query : t('emptyQuery');
-
-      // Embedding
-      embedBody.innerHTML = state.queryVector
-        ? `<p class="edu-overline">${esc(t('queryVector'))}</p>${vectorBars(state.queryVector)}<p class="raw-vec">${rawVector(state.queryVector)}</p>`
-        : `<p class="waiting">${esc(t('waitEmbed'))}</p>`;
-
-      // Retriever
-      retrieveFoot.textContent = t('retrieveFoot', { min: MIN_SIMILARITY.toFixed(2), k: TOP_K });
-      if (!state.scores.length) {
-        retrieveBody.innerHTML = `<p class="waiting">${esc(t('waitRetrieve'))}</p>`;
-      } else {
-        const above = state.scores.filter(s => s.similarity >= MIN_SIMILARITY).length;
-        const meta = `<p class="hit-meta">${esc(t('hitsMeta', { n: above, total: DOCS.length, min: MIN_SIMILARITY.toFixed(2) }))}</p>`;
-        retrieveBody.innerHTML = meta + (state.retrieved.length
-          ? `<div class="hits scroll">${state.retrieved.map(r => {
-              const d = docById(r.id);
-              return `<div class="hit" data-doc-id="${d.id}" data-similarity="${r.similarity.toFixed(4)}">
-                <div class="hit-top"><span>${icon(PRODUCT_ICONS[d.product])}${esc(t('docShort'))} ${d.id}</span><span>${(r.similarity * 100).toFixed(1)}%</span></div>
-                <span class="track"><span style="width:${(r.similarity * 100).toFixed(1)}%"></span></span>
-                <span class="hit-title">${esc(d.title[state.lang])}</span>
-              </div>`;
-            }).join('')}</div>`
-          : `<p class="waiting">${esc(t('noHits'))}</p>`);
-      }
-
-      // Prompt builder
-      systemPromptText.textContent = t('systemPrompt');
-      document.body.dataset.promptBuilt = state.promptBuilt;
-      if (state.promptBuilt) {
-        const userPrompt = buildUserPrompt();
-        const tokens = Math.ceil((t('systemPrompt').length + userPrompt.length) / CHARS_PER_TOKEN);
-        userPromptChip.textContent = t('promptDocsChip', { n: state.retrieved.length });
-        userPromptChip.hidden = false;
-        userPromptBody.innerHTML = `<p class="msg-text" id="userPromptText"></p>`;
-        userPromptBody.firstChild.textContent = userPrompt;
-        userPromptBody.dataset.promptDocs = state.retrieved.map(r => r.id).join(',');
-        promptStats.textContent = t('promptStats', { tokens });
-        promptStats.hidden = false;
-      } else {
-        userPromptChip.hidden = true;
-        userPromptBody.innerHTML = `<p class="waiting">${esc(t('waitPrompt'))}</p>`;
-        userPromptBody.dataset.promptDocs = '';
-        promptStats.hidden = true;
-      }
-
-      // Answer
-      const a = state.answer;
-      answerBody.dataset.answerKind = a ? a.kind : 'pending';
-      answerSources.innerHTML = '';
-      if (!a) {
-        answerBody.innerHTML = `<p class="waiting">${esc(t('waitAnswer'))}</p>`;
-      } else if (a.kind === 'none') {
-        answerBody.innerHTML = `<div class="note-block tone-blue edu-block">${icon('info')}<p>${esc(t('none'))}</p></div>`;
-      } else {
-        const text = a.kind === 'template'
-          ? t(a.id)
-          : [t('combineIntro'), ...a.docIds.map(id => { const d = docById(id); return `${d.title[state.lang]}:\n${d.text[state.lang]}`; })].join('\n\n');
-        answerBody.innerHTML = `<p class="answer scroll"></p>`;
-        answerBody.firstChild.textContent = text;
-        answerSources.innerHTML = `<span class="progress-status">${esc(t('sources'))}</span>` +
-          a.docIds.map(id => `<span class="edu-chip chip-blue">${esc(t('docShort'))} ${id}</span>`).join('');
-      }
+      stepperEl.innerHTML = items.join('');
     }
 
-    function renderDocs() {
-      toggleDocsButton.setAttribute('aria-expanded', state.docsOpen);
-      toggleDocsLabel.textContent = state.docsOpen ? t('hideDocs') : t('showDocs');
-      docGrid.hidden = !state.docsOpen;
-      docGrid.innerHTML = DOCS.map(d => `
-        <div class="card" data-doc-id="${d.id}">
-          <div class="card-head">
-            <span class="tile-h"><span class="badge tone-ink">${icon(PRODUCT_ICONS[d.product])}</span><h3>${esc(d.title[state.lang])}</h3></span>
-            <span class="edu-chip chip-stone">${esc(t('categories')[d.category])}</span>
+    function renderStage() {
+      const key = [state.view, state.done, state.lang, state.query].join('|');
+      if (key === stageKey) return;
+      stageKey = key;
+      const v = state.view;
+      stageCard.dataset.stage = v < 0 ? 'intro' : v;
+      if (v < 0) {
+        stageCard.innerHTML = `<div class="stage-head"><span class="tile-h"><span class="badge tone-ink">${icon('waypoints')}</span><h3>${esc(t('backLabel'))}</h3></span><span class="edu-chip chip-stone">${esc(t('stepsCount', { n: STEP_COUNT }))}</span></div>
+          <div class="stage-body">
+            <h1 class="intro-title">${esc(t('introTitle'))}</h1>
+            <p class="talk">${esc(t('introLead'))}</p>
+            <div class="intro-tiles reveal">${STAGES.map((s, i) => `<div class="intro-tile" style="--i:${i}"><div class="intro-tile-h"><span class="badge ${s.tone}">${icon(s.icon)}</span><span>${esc(stageTitle(i))}</span></div><p>${esc(t('stageShort')[i])}</p></div>`).join('')}</div>
+            <div class="callout tone-yellow edu-block">${icon('lightbulb')}<p>${esc(t('introHint'))}</p></div>
+          </div>`;
+      } else {
+        const talk = fill(t('stageTalk')[v], { k: TOP_K, min: fmt2(MIN_SIMILARITY) });
+        stageCard.innerHTML = `<div class="stage-head"><span class="tile-h"><span class="badge ${STAGES[v].tone}">${icon(STAGES[v].icon)}</span><h3>${esc(stageTitle(v))}</h3></span><span class="edu-chip chip-yellow">${esc(t('stepOf', { n: v + 1, total: STEP_COUNT }))}</span></div>
+          <div class="stage-body"><p class="talk">${esc(talk)}</p>${STAGE_BODY[v]()}</div>`;
+        fillStageText(v);
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function renderDrawer() {
+      drawerBody.innerHTML = DOCS.map(d => {
+        const s = scoreOf(d.id);
+        const inCtx = state.retrieved.some(r => r.id === d.id);
+        return `<article class="doc" id="doc-${d.id}" data-doc-id="${d.id}" data-focus="${state.focusDoc === d.id}">
+          <div class="doc-head"><span class="tile-h"><span class="badge tone-ink">${icon(PRODUCT_ICONS[d.product])}</span><h3>${esc(t('docShort'))} ${d.id} · ${esc(d.title[state.lang])}</h3></span><span class="edu-chip chip-stone">${esc(t('categories')[d.category])}</span></div>
+          <div class="doc-body"><p>${esc(d.text[state.lang])}</p></div>
+          <div class="doc-foot">
+            <span class="over-mono">${esc(t('vector'))}</span>
+            ${state.docVectors ? `<div class="doc-vec">${state.docVectors[d.id].map((x, i) => `<span class="cell">${esc(t('dims')[i])}<span class="track"><span style="width:${(x * 100).toFixed(1)}%"></span></span>${fmt2(x)}</span>`).join('')}</div>` : `<p class="waiting">${esc(t('notEmbedded'))}</p>`}
+            ${s ? `<div class="row"><span>${esc(t('simToQuery', { v: fmt2(s.similarity) }))}</span>${inCtx ? `<span class="edu-chip chip-green">${esc(t('legendIn'))}</span>` : ''}</div>` : ''}
           </div>
-          <div class="card-body"><p lang="${state.lang}">${esc(d.text[state.lang])}</p></div>
-          <div class="card-foot">
-            <p class="edu-overline" style="margin-bottom: 10px;">${esc(t('vector'))}</p>
-            ${state.docVectors ? vectorBars(state.docVectors[d.id]) : `<p class="waiting">${esc(t('notIndexed'))}</p>`}
-          </div>
-        </div>`).join('');
+        </article>`;
+      }).join('');
+      if (window.lucide) lucide.createIcons();
     }
 
     function render() {
       renderControls();
-      renderStages();
-      renderDocs();
+      renderChat();
+      renderStepper();
+      renderStage();
       if (window.lucide) lucide.createIcons();
     }
 
     // ─── Listeners ───
-    runButton.addEventListener('click', runSimulation);
-    nextButton.addEventListener('click', advance);
-    resetButton.addEventListener('click', resetSimulation);
+    chatForm.addEventListener('submit', e => { e.preventDefault(); runAll(); });
     queryInput.addEventListener('input', e => setQuery(e.target.value));
-    queryInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); runSimulation(); }
-    });
     samplesEl.addEventListener('click', e => {
       const btn = e.target.closest('[data-sample]');
       if (btn) setQuery(SAMPLES[state.lang][Number(btn.dataset.sample)]);
     });
-    langButtons.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
-    embedDocsButton.addEventListener('click', () => {
-      if (state.running) return;
-      indexDocs();
-      announce('liveIndexed', { n: DOCS.length });
-      render();
+    nextButton.addEventListener('click', forward);
+    backButton.addEventListener('click', backward);
+    resetButton.addEventListener('click', resetSimulation);
+    docsButton.addEventListener('click', () => openDocs());
+    drawerClose.addEventListener('click', () => drawer.close());
+    drawer.addEventListener('click', e => { if (e.target === drawer) drawer.close(); });
+    drawer.addEventListener('close', () => { state.focusDoc = null; });
+    stepperEl.addEventListener('click', e => {
+      const btn = e.target.closest('[data-goto]');
+      if (btn && !btn.disabled) goTo(Number(btn.dataset.goto));
     });
-    toggleDocsButton.addEventListener('click', toggleDocs);
+    document.addEventListener('click', e => {
+      const link = e.target.closest('[data-doc-link]');
+      if (!link) return;
+      e.preventDefault();
+      openDocs(Number(link.dataset.docLink));
+    });
+    langButtons.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
     document.addEventListener('keydown', e => {
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.ctrlKey || e.metaKey || e.altKey || drawer.open && e.key.toLowerCase() !== 'd') return;
       if (e.target.closest('input, textarea, select, [contenteditable]')) return;
       const key = e.key.toLowerCase();
-      if (key === 'n' || key === 'arrowright') { e.preventDefault(); advance(); }
+      if (key === 'arrowright' || key === 'n' || key === 'pagedown') { e.preventDefault(); forward(); }
+      else if (key === 'arrowleft' || key === 'pageup') { e.preventDefault(); backward(); }
       else if (key === 'r') resetSimulation();
-      else if (key === 'd') toggleDocs();
+      else if (key === 'd') drawer.open ? drawer.close() : openDocs();
       else if (key === 'l') setLang(state.lang === 'pl' ? 'en' : 'pl');
     });
 
