@@ -12,5 +12,6 @@ Jeden plik `index.html` (bez kroku budowania, działa z `file://`), przygotowany
 6. Odpowiedź – w czacie, z linkami do dokumentów źródłowych (otwierają panel dokumentów).
 
 - Język: polski (domyślny) i angielski, przełącznik PL/EN w nagłówku, wybór zapamiętany w `localStorage`.
-- Skróty: `→` dalej, `←` wstecz, `R` od nowa, `D` dokumenty, `L` język; `Enter` w czacie przechodzi wszystkie kroki automatycznie.
+- Krok po kroku: przycisk „Dalej: …” pod kartą kroku (lub `→`) przechodzi o jeden krok; „Wyślij” w czacie (`Enter`) tylko wysyła pytanie, dalsze kroki uruchamia użytkownik.
+- Skróty: `→` dalej, `←` wstecz, `R` od nowa, `D` dokumenty, `L` język.
 - Styl: edulab (Editorial Color).
