@@ -1,602 +1,1090 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <title>Tech Support RAG System Simulator</title>
-  <!-- Include Tailwind CSS from CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Include Lucide Icons for the icons -->
-  <script src="https://unpkg.com/lucide@latest/dist/lucide.min.js"></script>
-</head>
-<body class="bg-gray-100">
-  <div class="flex flex-col space-y-8 p-6 max-w-6xl mx-auto">
-    <h1 class="text-2xl font-bold text-center">Tech Support RAG System Simulator</h1>
-    
-    <!-- Query Input -->
-    <div class="w-full p-4 bg-gray-50 rounded-lg">
-      <label for="queryInput" class="block text-sm font-medium mb-2">Customer Support Query:</label>
-      <div class="flex space-x-2">
-        <input id="queryInput" type="text" value="How do I reset my TechX Pro 13 laptop if it freezes?" class="flex-1 p-2 border rounded" placeholder="Type your support question here...">
-        <button id="runSimulationButton" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Run Simulation</button>
-        <button id="nextStepButton" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Next Step</button>
-      </div>
-    </div>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Symulator RAG dla wsparcia technicznego</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FFD500'/%3E%3Ctext x='16' y='24' font-family='Arial,sans-serif' font-weight='700' font-size='22' text-anchor='middle' fill='%231C1917'%3ER%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap">
+  <style>
+    @keyframes boot-reveal { to { visibility: visible; } }
+    html:not(.app-ready) body { visibility: hidden; animation: boot-reveal 0s 4s forwards; }
+    @media print { html:not(.app-ready) body { visibility: visible; animation: none; } }
+  </style>
+  <noscript><style>html:not(.app-ready) body { visibility: visible; animation: none; }</style></noscript>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <style>
+/* ============================================================
+   edulab - Colors & Type foundation
+   Fonts (Outfit, IBM Plex Sans, Roboto Mono) load from Google Fonts
+   via the <link> tags in tokens/head.html - paste that into <head>.
+   No @import here: it chains requests and blocks rendering.
+   ============================================================ */
 
-    <!-- Documents Visual Representation Accordion -->
-    <div class="bg-white p-4 rounded-lg shadow-lg">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-bold">Documents Visual Representation</h2>
-        <div class="space-x-2">
-          <button id="embedDocumentsButton" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
-            Embed Documents
-          </button>
-          <button id="toggleAccordionButton" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
-            Toggle Documents
-          </button>
+:root {
+  /* ---- Brand fonts ---- */
+  --font-display: 'Outfit', 'IBM Plex Sans', system-ui, sans-serif;
+  --font-sans:    'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-mono:    'Roboto Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ============================================================
+     RAW COLOR TOKENS
+     ============================================================ */
+
+  /* Paper - page background is white; the stone steps are bands / wells.
+     Warm neutral grey (no yellow cast) so yellow and the colour blocks stay the
+     loudest thing on the page. Stone v2 (2026-10-10) replaced the cream sand
+     (#FBF7E6 / #F5EDCB), which at 1.07:1 on white did not read as a surface. */
+  --paper:    #FFFFFF;   /* page background (white)                       */
+  --paper-2:  #F5F3F0;   /* stone band: alternating sections, card heads   */
+  --paper-3:  #EAE6E0;   /* deepest stone: wells, table heads, bar tracks  */
+  --surface:  #FFFFFF;   /* cards & sheets                                */
+
+  /* Ink - warm near-black text & lines */
+  --ink:      #1C1917;   /* primary text                                    */
+  --ink-2:    #44403C;   /* secondary text, 10.3:1 on white                 */
+  --ink-3:    #625B53;   /* muted / placeholder: >= 4.5:1 on every paper step */
+  --line:     #E0DBD3;   /* hairline: dividers, table rows, card heads      */
+  --line-2:   #C9C2B7;   /* stronger: card contours, section rules          */
+  --line-strong: #857C69;/* control boundaries (inputs, ghost buttons,
+                            answer options): >= 3:1 on paper steps (WCAG 1.4.11) */
+
+  /* ---- Brand: Yellow main · Blue + Green secondary · Red danger ----
+     Plain saturated colours. The base colour (--blue) is for large fills,
+     illustrations and large text (>= 24px, or 19px bold). "-soft" is the
+     solid fill for chips and panels that carry small text: it is the
+     AA shade (= "-600"), so its "-ink" (white; dark ink on yellow) reaches
+     4.5:1. A colour used AS text goes only on white and uses "-600".
+     Never colour-on-colour (no green text on green).
+     Gate: python3 scripts/check-contrast.py */
+
+  /* Yellow - primary (buttons, progress, values on dark panels) */
+  --yellow:      #FFD500;
+  --yellow-600:  #F0C800;  /* hover / press          */
+  --yellow-soft: #FFD500;  /* chip / panel fill      */
+  --yellow-ink:  #1C1917;  /* text on yellow         */
+
+  /* Blue - secondary (panels, chips, correct / selected state) */
+  --blue:      #1E8FC2;
+  --blue-600:  #177AA8;
+  --blue-soft: #177AA8;   /* = blue-600, white text 4.8:1 */
+  --blue-ink:  #FFFFFF;
+
+  /* Green - secondary support (chips, success) */
+  --green:      #00A651;
+  --green-600:  #078342;  /* hover / press, AA text shade */
+  --green-soft: #078342;  /* = green-600, white text 4.9:1 */
+  --green-ink:  #FFFFFF;
+
+  /* Red - danger / important / wrong (use sparingly) */
+  --red:      #E5322D;
+  --red-600:  #C92823;
+  --red-soft: #C92823;   /* = red-600, white text 5.5:1 */
+  --red-ink:  #FFFFFF;
+
+  /* Grape - 5th category tone (colour-coded groups), from the play palette */
+  --grape:      #7A5AC2;
+  --grape-soft: #7A5AC2;  /* white text 5.2:1 */
+  --grape-ink:  #FFFFFF;
+
+  /* Legacy role aliases - older edulab apps use these names */
+  --marigold: var(--yellow); --marigold-600: var(--yellow-600); --marigold-soft: var(--yellow-soft); --marigold-ink: var(--yellow-ink);
+  --teal:     var(--blue);   --teal-600:     var(--blue-600);   --teal-soft:     var(--blue-soft);   --teal-ink:     var(--blue-ink);
+  --sky:      var(--green);                                     --sky-soft:      var(--green-soft);  --sky-ink:      var(--green-ink);
+  --coral:    var(--red);    --coral-600:    var(--red-600);    --coral-soft:    var(--red-soft);    --coral-ink:    var(--red-ink);
+
+  /* Play palette - subject/category colours in the kids app */
+  --play-sun:    #FFD500;
+  --play-grass:  #00A651;
+  --play-berry:  #C6478B;
+  --play-grape:  #7A5AC2;
+  --play-sky:    #1E8FC2;
+  --play-coral:  #E5322D;
+
+  /* ---- Semantic ---- */
+  --success:      #00A651;  --success-soft: #078342;  --success-ink: #FFFFFF;
+  --warning:      #FFD500;  --warning-soft: #FFD500;  --warning-ink: #1C1917;
+  --danger:       #E5322D;  --danger-soft:  #C92823;  --danger-ink:  #FFFFFF;
+  --info:         #1E8FC2;  --info-soft:    #177AA8;  --info-ink:    #FFFFFF;
+
+  /* ---- Functional aliases ---- */
+  --bg:        var(--paper);
+  --fg:        var(--ink);
+  --fg-muted:  var(--ink-2);
+  --primary:   var(--yellow);
+  --on-primary:#1C1917;      /* dark text on yellow */
+  /* White gap + ink band: >= 3:1 on paper, sand, yellow and every chip fill.
+     Pair with `outline: 3px solid transparent` so forced-colours mode still shows focus. */
+  --focus-ring: 0 0 0 2px var(--paper), 0 0 0 5px var(--ink);
+  /* Range-slider track */
+  --track: color-mix(in srgb, var(--ink) 24%, transparent);
+
+  /* ============================================================
+     SPACING  (4pt base)
+     ============================================================ */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px; --sp-20: 80px; --sp-24: 96px;
+
+  /* ---- Radii (friendly, generous) ---- */
+  --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-pill: 999px;
+
+  /* ---- Elevation - warm, low, soft ---- */
+  --shadow-sm: 0 1px 2px rgba(33,30,26,.10), 0 2px 6px rgba(33,30,26,.06);
+  --shadow-md: 0 6px 18px rgba(33,30,26,.12), 0 1px 3px rgba(33,30,26,.08);
+  --shadow-lg: 0 16px 40px rgba(33,30,26,.12), 0 3px 8px rgba(33,30,26,.06);
+  --shadow-primary:  0 8px 22px color-mix(in srgb, var(--yellow) 30%, transparent);
+  --shadow-marigold: var(--shadow-primary);   /* legacy alias */
+
+  /* ============================================================
+     TYPE SCALE (semantic sizes)
+     ============================================================ */
+  --display-font:  clamp(48px, 6vw, 72px);
+  --h1: 44px; --h2: 33px; --h3: 25px; --h4: 19px;
+  --body-lg: 18px; --body: 16px; --body-sm: 14px;
+  --caption: 13px; --overline: 12px;
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT STYLES
+   Apply via element selectors or .edu-prose wrapper.
+   Element defaults are wrapped in :where(.edu) (zero specificity) so any
+   single class wins: <p class="edu-overline">, <p class="edu-small">,
+   <h1 class="app-title"> keep their own font/size instead of the element default.
+   ============================================================ */
+
+.edu-display, :where(.edu) h1.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--display-font);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+:where(.edu) h1, .edu-h1 {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: var(--h1);
+  line-height: 1.06; letter-spacing: -0.02em; color: var(--ink);
+}
+:where(.edu) h2, .edu-h2 {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: var(--h2);
+  line-height: 1.12; letter-spacing: -0.015em; color: var(--ink);
+}
+:where(.edu) h3, .edu-h3 {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: var(--h3);
+  line-height: 1.2; letter-spacing: -0.01em; color: var(--ink);
+}
+:where(.edu) h4, .edu-h4 {
+  font-family: var(--font-sans);
+  font-weight: 700; font-size: var(--h4);
+  line-height: 1.3; color: var(--ink);
+}
+:where(.edu) p, .edu-p, .edu-body {
+  font-family: var(--font-sans);
+  font-weight: 400; font-size: var(--body);
+  line-height: 1.6; color: var(--ink-2);
+}
+.edu-body-lg { font-family: var(--font-sans); font-size: var(--body-lg); line-height: 1.6; color: var(--ink-2); }
+.edu-small  { font-family: var(--font-sans); font-size: var(--body-sm); line-height: 1.5; color: var(--ink-2); }
+.edu-caption{ font-family: var(--font-sans); font-size: var(--caption); line-height: 1.45; color: var(--ink-3); }
+
+/* Overline - mono, tracked; functional labels only (never above page/section titles) */
+.edu-overline {
+  font-family: var(--font-mono);
+  font-weight: 500; font-size: var(--overline);
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink);
+}
+:where(.edu) code, .edu-mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em; color: var(--ink);
+  background: var(--paper-3); padding: 0.12em 0.4em; border-radius: var(--r-xs);
+}
+
+/* Solid colour blocks (callouts, stat cards, chips): set background: var(--X-soft) and
+   color: var(--X-ink) on the block, add .edu-block, and every heading/paragraph inside
+   inherits that text colour instead of the default ink. */
+.edu-block, .edu-block h1, .edu-block h2, .edu-block h3, .edu-block h4, .edu-block p,
+.edu-block li, .edu-block small { color: inherit; }
+
+body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+  </style>
+  <style>
+    /* ─── Base ─── */
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; }
+    :focus-visible { outline: 3px solid transparent; outline-offset: 2px; box-shadow: var(--focus-ring); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    [hidden] { display: none !important; }
+
+    /* ─── Top menu ─── */
+    .edu-header { position: sticky; top: 0; z-index: 50; width: 100%; background: var(--paper); border-bottom: 1px solid var(--line-2); }
+    .edu-header-inner { max-width: 1100px; margin: 0 auto; padding: 8px 30px; display: flex; align-items: center; gap: 12px; }
+    .edu-logo { width: 64px; height: 64px; display: block; margin-right: -6px; }
+    .edu-wordmark { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -.02em; color: var(--ink); }
+    .edu-header-inner .edu-seg { margin-left: auto; }
+    .edu-seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--r-pill); }
+    .edu-seg button { border: none; background: transparent; padding: 7px 14px; border-radius: var(--r-pill); font-family: var(--font-sans); font-weight: 600; color: var(--ink-2); cursor: pointer; transition: background-color .15s; }
+    .edu-seg button:hover { background: var(--paper-3); }
+    .edu-seg button.active { background: var(--yellow); color: var(--yellow-ink); }
+
+    /* ─── Page head ─── */
+    .page-head { max-width: 1100px; margin: 0 auto; padding: 44px 30px 52px; text-align: left; }
+    .app-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.3rem, 5vw, 3.3rem); letter-spacing: -.025em; line-height: 1.05; color: var(--ink); margin: 0 0 14px; }
+    .edu-lead { font-size: 1.15rem; line-height: 1.6; color: var(--ink-2); margin: 0; }
+
+    /* ─── Section bands ─── */
+    .sec { margin: 0; padding: 52px 0 60px; border-top: 1px solid var(--line); }
+    .sec:nth-of-type(odd) { background: var(--paper-2); }
+    .sec > .wrap { max-width: 1100px; margin: 0 auto; padding: 0 30px; }
+    .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+    .sec-head h2 { margin: 0; }
+    .sec-head::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
+
+    /* ─── Tones & badges ─── */
+    .tone-grape  { background: var(--grape-soft);  color: var(--grape-ink); }
+    .tone-blue   { background: var(--blue-soft);   color: var(--blue-ink); }
+    .tone-yellow { background: var(--yellow-soft); color: var(--yellow-ink); }
+    .tone-green  { background: var(--green-soft);  color: var(--green-ink); }
+    .tone-ink    { background: var(--ink);         color: var(--paper); }
+    .tone-stone  { background: var(--paper-3);     color: var(--ink); }
+    .ic { width: 18px; height: 18px; flex: none; }
+    .badge { flex: none; width: 34px; height: 34px; border-radius: var(--r-sm); display: inline-grid; place-items: center; }
+    .badge-lg { width: 46px; height: 46px; border-radius: var(--r-md); }
+    .badge-lg .ic { width: 24px; height: 24px; }
+    .badge.tone-ink { color: var(--yellow); }
+    .tile-h { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .tile-h h3 { margin: 0; font-size: 18px; line-height: 1.3; }
+
+    /* ─── Cards ─── */
+    .card { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column; min-width: 0; transition: box-shadow .2s, border-color .2s; }
+    .card-head { padding: 14px 22px; background: var(--paper-2); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .card-body { padding: 20px 22px; flex: 1; min-width: 0; }
+    .card-foot { padding: 14px 22px; border-top: 1px dashed var(--line-2); display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .card-foot p { margin: 0; font-size: var(--body-sm); }
+
+    /* ─── Chips ─── */
+    .edu-chip { font-family: var(--font-mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; padding: 4px 10px; border-radius: var(--r-pill); white-space: nowrap; }
+    .chip-stone  { background: var(--paper-3); color: var(--ink); }
+    .chip-yellow { background: var(--yellow-soft); color: var(--yellow-ink); }
+    .chip-green  { background: var(--green-soft); color: var(--green-ink); }
+    .chip-blue   { background: var(--blue-soft); color: var(--blue-ink); }
+
+    /* ─── Controls ─── */
+    .field-label { display: block; margin: 0 0 8px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: var(--ink); }
+    .query-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .input { flex: 1 1 320px; min-width: 0; padding: 11px 14px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); font: inherit; font-size: var(--body); background: var(--surface); color: var(--ink); }
+    .input::placeholder { color: var(--ink-3); }
+    .input[readonly] { background: var(--paper-2); }
+    .edu-btn, .btn-ghost { display: inline-flex; align-items: center; gap: 8px; border-radius: var(--r-pill); padding: 11px 20px; font-family: var(--font-display); font-weight: 600; font-size: 16px; cursor: pointer; transition: background-color .15s, transform .12s cubic-bezier(.32,.72,.32,1); }
+    .edu-btn { background: var(--yellow); color: var(--on-primary); border: 1px solid var(--yellow); box-shadow: var(--shadow-primary); }
+    .edu-btn:hover { background: var(--yellow-600); }
+    .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); }
+    .btn-ghost:hover { background: var(--paper-2); }
+    .edu-btn:active, .btn-ghost:active { transform: scale(.96); }
+    .edu-btn:disabled, .btn-ghost:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .samples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .sample { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); border-radius: var(--r-pill); padding: 7px 14px; font-family: var(--font-sans); font-size: var(--body-sm); cursor: pointer; text-align: left; transition: background-color .15s; }
+    .sample:hover { background: var(--paper-2); }
+    .sample[aria-pressed="true"] { background: var(--blue-soft); border-color: var(--blue-soft); color: var(--blue-ink); }
+    kbd { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--line-strong); border-radius: var(--r-xs); padding: 1px 6px; background: var(--surface); color: var(--ink); }
+    .shortcuts { color: var(--ink-2); font-size: var(--caption); display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+
+    /* ─── Progress ─── */
+    .progress { display: flex; align-items: center; gap: 14px; flex: 1 1 320px; }
+    .progress-label { font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink); white-space: nowrap; }
+    .progress-bar { flex: 1; min-width: 80px; height: 10px; background: var(--paper-3); border-radius: var(--r-pill); overflow: hidden; }
+    .progress-bar span { display: block; height: 100%; background: var(--yellow); border-radius: var(--r-pill); transition: width .3s; }
+    .progress-status { font-size: var(--body-sm); color: var(--ink-2); }
+
+    /* ─── RAG flow ─── */
+    .flow-row { display: grid; grid-template-columns: 1fr 32px 1fr 32px 1fr; align-items: stretch; }
+    .flow-arrow { display: grid; place-items: center; color: var(--ink-3); }
+    .flow-down { display: grid; place-items: center; color: var(--ink-3); padding: 10px 0; }
+    .stage[data-state="active"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink), var(--shadow-md); }
+    .stage .card-body { min-height: 190px; }
+    .scroll { max-height: 260px; overflow-y: auto; }
+    .waiting { margin: 0; color: var(--ink-3); font-style: italic; font-size: var(--body-sm); }
+    .well { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px; color: var(--ink); overflow-wrap: anywhere; }
+    .raw-vec { margin: 12px 0 0; font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); overflow-wrap: anywhere; }
+    .card-body .edu-overline { margin: 0 0 10px; }
+
+    .kb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .kb-doc { border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .kb-doc[data-hit="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+    .kb-doc-top { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+    .kb-doc-title { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.35; display: flex; gap: 6px; align-items: flex-start; }
+    .kb-doc-title .ic { width: 16px; height: 16px; margin-top: 1px; }
+    .kb-doc-vec { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
+
+    .vec { display: grid; gap: 7px; }
+    .vec-row { display: grid; grid-template-columns: 84px 1fr 44px; gap: 8px; align-items: center; font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); }
+    .vec-row .val { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .track { height: 8px; background: var(--paper-3); border-radius: var(--r-pill); overflow: hidden; }
+    .track span { display: block; height: 100%; background: var(--ink); border-radius: var(--r-pill); }
+
+    .hits { display: grid; gap: 8px; }
+    .hit { border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 10px 12px; display: grid; gap: 6px; }
+    .hit-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--ink); }
+    .hit-top span { display: inline-flex; align-items: center; gap: 6px; }
+    .hit-title { font-size: 13px; color: var(--ink-2); line-height: 1.35; }
+    .hit-meta { margin: 0 0 10px; font-size: var(--body-sm); color: var(--ink-2); }
+
+    .answer { margin: 0; white-space: pre-wrap; color: var(--ink); font-size: var(--body); line-height: 1.6; }
+    .sources { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .note-block { border-radius: var(--r-md); padding: 16px 20px; display: flex; gap: 12px; align-items: flex-start; }
+    .note-block p { margin: 0; }
+
+    /* ─── Documents ─── */
+    .doc-tools { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .doc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .doc-grid .card-body p { margin: 0; font-size: var(--body-sm); }
+    .doc-grid .card-foot { display: block; }
+    .chev { transition: transform .2s; }
+    [aria-expanded="false"] .chev { transform: rotate(-90deg); }
+
+    /* ─── How it works ─── */
+    .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    .tiles .card-body p { margin: 0; font-size: var(--body-sm); }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 1080px) {
+      .kb-grid { grid-template-columns: repeat(2, 1fr); }
+      .tiles { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .edu-header-inner { padding: 6px 16px; }
+      .edu-logo { width: 48px; height: 48px; }
+      .page-head { padding: 28px 16px 36px; }
+      .sec { padding: 36px 0 44px; } .sec > .wrap { padding: 0 16px; }
+      .sec-head { flex-wrap: wrap; }
+      .sec-head h2 { flex: 1; min-width: 0; font-size: 26px; }
+      .sec-head::after { flex: 1 0 100%; }
+      .flow-row { grid-template-columns: 1fr; }
+      .flow-arrow { padding: 10px 0; transform: rotate(90deg); }
+      .kb-grid, .doc-grid, .tiles { grid-template-columns: 1fr; }
+      .card-head, .card-body, .card-foot { padding-left: 16px; padding-right: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body class="edu" data-step="0" data-running="false" data-indexed="false">
+  <header class="edu-header"><div class="edu-header-inner">
+    <img class="edu-logo" alt="edulab" src="data:image/png;base64,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">
+    <span class="edu-wordmark">edulab</span>
+    <div class="edu-seg" role="group" data-i18n-aria="langSwitch">
+      <button type="button" data-lang="pl" lang="pl">PL</button>
+      <button type="button" data-lang="en" lang="en">EN</button>
+    </div>
+  </div></header>
+
+  <header class="page-head">
+    <h1 class="app-title" data-i18n="title"></h1>
+    <p class="edu-lead" data-i18n="lead"></p>
+  </header>
+
+  <main>
+    <!-- ─── Query ─── -->
+    <section class="sec" aria-labelledby="secQuery"><div class="wrap">
+      <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="message-circle-question" class="ic" aria-hidden="true"></i></span><h2 id="secQuery" data-i18n="secQuery"></h2></div>
+      <div class="card">
+        <div class="card-body">
+          <label class="field-label" for="queryInput" data-i18n="queryLabel"></label>
+          <div class="query-row">
+            <input id="queryInput" class="input" type="text" autocomplete="off" data-i18n-placeholder="queryPlaceholder">
+            <button id="runButton" type="button" class="edu-btn"><i data-lucide="play" class="ic" aria-hidden="true"></i><span data-i18n="run"></span></button>
+            <button id="nextButton" type="button" class="btn-ghost"><i data-lucide="step-forward" class="ic" aria-hidden="true"></i><span id="nextLabel"></span></button>
+            <button id="resetButton" type="button" class="btn-ghost"><i data-lucide="rotate-ccw" class="ic" aria-hidden="true"></i><span data-i18n="reset"></span></button>
+          </div>
+          <p class="field-label" style="margin-top: 22px;" data-i18n="samplesLabel"></p>
+          <div class="samples" id="samples" style="margin-top: 0;"></div>
+        </div>
+        <div class="card-foot">
+          <div class="progress">
+            <span class="progress-label" id="progressLabel"></span>
+            <div class="progress-bar" role="progressbar" id="progressBar" aria-valuemin="0" aria-valuemax="5"><span id="progressFill"></span></div>
+            <span class="progress-status" id="progressStatus"></span>
+          </div>
+          <div class="shortcuts" id="shortcuts"></div>
         </div>
       </div>
-      <div id="docVisualContainer" class="mt-4 grid grid-cols-1 gap-4">
-        <div class="text-gray-500 italic">Documents have not been embedded yet.</div>
-      </div>
-    </div>
-    
-    <!-- RAG Flow Visualization -->
-    <div class="w-full bg-white rounded-lg shadow-lg p-6">
-      <div class="flex flex-col items-center space-y-6">
-        <!-- Document Store (Indexing Documents) -->
-        <div class="flex items-center justify-center w-full">
-          <div id="documentStoreBox" class="relative p-4 border-2 rounded-lg w-60 border-gray-300">
-            <div class="absolute -top-3 left-2 bg-white px-2 font-medium text-sm">
-              Knowledge Base (Pre-indexed)
-            </div>
-            <div class="flex items-center space-x-2 mb-2">
-              <i data-lucide="database" class="text-blue-600"></i>
-              <span class="font-bold">Technical Support Docs</span>
-            </div>
-            <div id="documentStoreContent" class="text-xs h-32 overflow-y-auto">
-              <!-- Document list will be rendered here -->
-            </div>
-          </div>
+      <p class="sr-only" aria-live="polite" id="live"></p>
+    </div></section>
+
+    <!-- ─── Pipeline ─── -->
+    <section class="sec" aria-labelledby="secFlow"><div class="wrap">
+      <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="workflow" class="ic" aria-hidden="true"></i></span><h2 id="secFlow" data-i18n="secFlow"></h2></div>
+
+      <div class="card stage" data-stage="0" data-state="idle">
+        <div class="card-head">
+          <span class="tile-h"><span class="badge tone-grape"><i data-lucide="database" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage0"></h3></span>
+          <span class="edu-chip" data-chip></span>
         </div>
-        
-        <!-- Query Phase Components -->
-        <div class="flex items-start justify-between w-full space-x-4">
-          <!-- Customer Query -->
-          <div id="customerQueryBox" class="p-4 border-2 rounded-lg w-60 border-gray-300">
-            <div class="flex items-center space-x-2 mb-2">
-              <i data-lucide="file-text" class="text-blue-600"></i>
-              <span class="font-bold">Customer Query</span>
-            </div>
-            <div id="customerQueryContent" class="text-sm p-2 border rounded bg-gray-50 h-28 overflow-y-auto"></div>
-            <div class="mt-2 text-xs text-gray-600">
-              Step 1: Customer submits support question
-            </div>
+        <div class="card-body" id="kbBody"></div>
+        <div class="card-foot"><p data-i18n="stage0Desc"></p><span class="edu-chip chip-stone" id="kbStatus"></span></div>
+      </div>
+
+      <div class="flow-down" aria-hidden="true"><i data-lucide="arrow-down" class="ic"></i></div>
+
+      <div class="flow-row">
+        <div class="card stage" data-stage="1" data-state="idle">
+          <div class="card-head">
+            <span class="tile-h"><span class="badge tone-blue"><i data-lucide="file-text" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage1"></h3></span>
+            <span class="edu-chip" data-chip></span>
           </div>
-          
-          <div class="flex items-center">
-            <i data-lucide="arrow-right" class="text-gray-500"></i>
+          <div class="card-body" id="queryBody"></div>
+          <div class="card-foot"><p data-i18n="stage1Desc"></p></div>
+        </div>
+        <div class="flow-arrow" aria-hidden="true"><i data-lucide="arrow-right" class="ic"></i></div>
+        <div class="card stage" data-stage="2" data-state="idle">
+          <div class="card-head">
+            <span class="tile-h"><span class="badge tone-yellow"><i data-lucide="cpu" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage2"></h3></span>
+            <span class="edu-chip" data-chip></span>
           </div>
-          
-          <!-- Embedding Model (Query Vector) -->
-          <div id="embeddingModelBox" class="p-4 border-2 rounded-lg w-60 border-gray-300">
-            <div class="flex items-center space-x-2 mb-2">
-              <i data-lucide="cpu" class="text-purple-600"></i>
-              <span class="font-bold">Embedding Model</span>
-            </div>
-            <div class="text-sm">
-              <div class="mb-2">Query Vector:</div>
-              <div id="embeddingModelContent" class="p-2 bg-gray-50 rounded text-xs italic h-28">
-                Waiting for query to process...
-              </div>
-            </div>
-            <div class="mt-2 text-xs text-gray-600">
-              Step 2: Convert query to semantic vector
-            </div>
+          <div class="card-body" id="embedBody"></div>
+          <div class="card-foot"><p data-i18n="stage2Desc"></p></div>
+        </div>
+        <div class="flow-arrow" aria-hidden="true"><i data-lucide="arrow-right" class="ic"></i></div>
+        <div class="card stage" data-stage="3" data-state="idle">
+          <div class="card-head">
+            <span class="tile-h"><span class="badge tone-green"><i data-lucide="search" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage3"></h3></span>
+            <span class="edu-chip" data-chip></span>
           </div>
-          
-          <div class="flex items-center">
-            <i data-lucide="arrow-right" class="text-gray-500"></i>
-          </div>
-          
-          <!-- Retriever -->
-          <div id="retrieverBox" class="p-4 border-2 rounded-lg w-60 border-gray-300">
-            <div class="flex items-center space-x-2 mb-2">
-              <i data-lucide="search" class="text-green-600"></i>
-              <span class="font-bold">Retriever</span>
-            </div>
-            <div class="text-sm">
-              <div class="mb-1">Retrieved Documents:</div>
-              <div id="retrieverContent" class="h-28 overflow-y-auto">
-                <div class="p-2 bg-gray-50 rounded text-xs italic">
-                  Waiting for embedding...
-                </div>
-              </div>
-            </div>
-            <div class="mt-2 text-xs text-gray-600">
-              Step 3: Find relevant support documents
-            </div>
-          </div>
-          
-          <div class="flex items-center">
-            <i data-lucide="arrow-right" class="text-gray-500"></i>
-          </div>
-          
-          <!-- Response Generator -->
-          <div id="responseGeneratorBox" class="p-4 border-2 rounded-lg w-60 border-gray-300">
-            <div class="flex items-center space-x-2 mb-2">
-              <i data-lucide="message-square" class="text-red-600"></i>
-              <span class="font-bold">Response Generator</span>
-            </div>
-            <div id="responseGeneratorContent" class="text-sm h-28 overflow-y-auto">
-              <div class="p-2 bg-gray-50 rounded text-xs italic">
-                Waiting for retrieval...
-              </div>
-            </div>
-            <div class="mt-2 text-xs text-gray-600">
-              Step 4: Generate helpful support response
-            </div>
-          </div>
+          <div class="card-body" id="retrieveBody"></div>
+          <div class="card-foot"><p id="retrieveFoot"></p></div>
         </div>
       </div>
-    </div>
-    
-    <!-- Process Explanation -->
-    <div class="bg-gray-50 p-4 rounded-lg">
-      <h2 class="font-bold mb-2">How This Tech Support RAG System Works:</h2>
-      <ol class="list-decimal list-inside space-y-2 text-sm">
-        <li><span class="font-medium">Document Indexing:</span> The system embeds the support documents using a vectoriser (the same one used for user queries) and stores them in a vector database.</li>
-        <li><span class="font-medium">Query Understanding:</span> The customer's support question is converted into a semantic vector.</li>
-        <li><span class="font-medium">Relevant Document Retrieval:</span> The system finds the most contextually similar documents using vector similarity.</li>
-        <li><span class="font-medium">Response Generation:</span> An AI combines the retrieved technical information with the customer's question to generate a helpful, specific response.</li>
-      </ol>
-      <div class="mt-4 text-sm text-gray-600">
-        <p>Note: If the question is irrelevant (for example, a weather question), the system will indicate that it has no documents to answer it.</p>
+
+      <div class="flow-down" aria-hidden="true"><i data-lucide="arrow-down" class="ic"></i></div>
+
+      <div class="card stage" data-stage="4" data-state="idle">
+        <div class="card-head">
+          <span class="tile-h"><span class="badge tone-ink"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><h3 data-i18n="stage4"></h3></span>
+          <span class="edu-chip" data-chip></span>
+        </div>
+        <div class="card-body" id="answerBody"></div>
+        <div class="card-foot"><p data-i18n="stage4Desc"></p><div class="sources" id="answerSources"></div></div>
       </div>
-    </div>
-    
-    <!-- Try Different Queries -->
-    <div class="bg-white p-4 rounded-lg border">
-      <h3 class="font-bold mb-2">Try These Sample Support Queries:</h3>
-      <div class="flex flex-wrap gap-2">
-        <button 
-          class="sampleQuery px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded"
-          data-query="How do I reset my TechX Pro 13 laptop if it freezes?">
-          How do I reset my TechX Pro 13 laptop if it freezes?
-        </button>
-        <button 
-          class="sampleQuery px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded"
-          data-query="How do I connect my SoundWave X300 headphones to my phone?">
-          How do I connect my SoundWave X300 headphones to my phone?
-        </button>
-        <button 
-          class="sampleQuery px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded"
-          data-query="How can I mirror my laptop screen to my SmartView 4K TV?">
-          How can I mirror my laptop screen to my SmartView 4K TV?
-        </button>
-        <button 
-          class="sampleQuery px-3 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded"
-          data-query="What is the weather today?">
-          What is the weather today?
-        </button>
+    </div></section>
+
+    <!-- ─── Documents ─── -->
+    <section class="sec" aria-labelledby="secDocs"><div class="wrap">
+      <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="layers" class="ic" aria-hidden="true"></i></span><h2 id="secDocs" data-i18n="secDocs"></h2></div>
+      <div class="doc-tools">
+        <button id="embedDocsButton" type="button" class="edu-btn"><i data-lucide="sparkles" class="ic" aria-hidden="true"></i><span data-i18n="embedDocs"></span></button>
+        <button id="toggleDocsButton" type="button" class="btn-ghost" aria-controls="docGrid" aria-expanded="true"><i data-lucide="chevron-down" class="ic chev" aria-hidden="true"></i><span id="toggleDocsLabel"></span></button>
       </div>
-    </div>
-  </div>
-  
-  <!-- JavaScript -->
+      <div class="doc-grid" id="docGrid"></div>
+    </div></section>
+
+    <!-- ─── How it works ─── -->
+    <section class="sec" aria-labelledby="secHow"><div class="wrap">
+      <div class="sec-head"><span class="badge badge-lg tone-ink"><i data-lucide="book-open" class="ic" aria-hidden="true"></i></span><h2 id="secHow" data-i18n="secHow"></h2></div>
+      <div class="tiles">
+        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-grape"><i data-lucide="database" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how1Title"></h3></span></div><div class="card-body"><p data-i18n="how1"></p></div></div>
+        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-yellow"><i data-lucide="cpu" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how2Title"></h3></span></div><div class="card-body"><p data-i18n="how2"></p></div></div>
+        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-green"><i data-lucide="search" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how3Title"></h3></span></div><div class="card-body"><p data-i18n="how3"></p></div></div>
+        <div class="card"><div class="card-head"><span class="tile-h"><span class="badge tone-ink"><i data-lucide="message-square" class="ic" aria-hidden="true"></i></span><h3 data-i18n="how4Title"></h3></span></div><div class="card-body"><p data-i18n="how4"></p></div></div>
+      </div>
+      <div class="note-block tone-yellow edu-block"><i data-lucide="lightbulb" class="ic" aria-hidden="true" style="margin-top: 3px;"></i><p data-i18n="howNote"></p></div>
+    </div></section>
+  </main>
+
   <script>
-    // Global state variables and simulation steps:
-    // Step 0: Document Indexing, Step 1: Customer Query, Step 2: Query Embedding,
-    // Step 3: Document Retrieval, Step 4: Response Generation, Step 5: Reset.
-    let currentStep = 0;
-    let isRunning = false;
-    let query = document.getElementById('queryInput').value;
-    let queryEmbedding = null;
-    let retrievedDocs = [];
-    let generatedResponse = '';
-    let indexedDocuments = [];
-    
-    // Tech support documents (pre-defined)
-    const documents = [
-      { 
-        id: 1, 
-        title: "TechX Pro 13 - Troubleshooting Frozen System",
-        text: "If your TechX Pro 13 laptop freezes or becomes unresponsive, press and hold the power button for 10 seconds to force a shutdown. Wait 30 seconds before restarting. If the issue persists, try resetting the SMC by holding Shift+Control+Option and the power button simultaneously for 10 seconds.", 
-        product: "laptop",
-        category: "troubleshooting",
-        embedding: [0.9, 0.2, 0.3, 0.1] 
-      },
-      { 
-        id: 2, 
-        title: "TechX Pro 13 - Battery Optimization",
-        text: "To maximize your TechX Pro 13 battery life, adjust your display brightness, close unused applications, and disable background processes. For best results, enable Battery Saver mode when below 20% charge. The battery is rated for 1000 charge cycles before degradation begins.", 
-        product: "laptop",
-        category: "maintenance",
-        embedding: [0.7, 0.3, 0.1, 0.2] 
-      },
-      { 
-        id: 3, 
-        title: "SoundWave X300 Headphones - Pairing Instructions",
-        text: "To pair your SoundWave X300 headphones with a new device, press and hold the multifunction button for 5 seconds until the LED flashes blue and red alternately. Enable Bluetooth on your device and select 'SoundWave X300' from the list of available devices. The LED will turn solid blue when successfully connected.", 
-        product: "headphones",
-        category: "setup",
-        embedding: [0.1, 0.8, 0.2, 0.4] 
-      },
-      { 
-        id: 4, 
-        title: "SoundWave X300 Headphones - Factory Reset",
-        text: "To perform a factory reset on your SoundWave X300 headphones, press and hold both volume buttons simultaneously for 10 seconds while the headphones are powered on. The LED will flash purple three times to confirm the reset. Note that this will remove all paired devices from memory.", 
-        product: "headphones",
-        category: "troubleshooting",
-        embedding: [0.2, 0.7, 0.3, 0.5] 
-      },
-      { 
-        id: 5, 
-        title: "PixelPlus Ultra - Camera Settings",
-        text: "The PixelPlus Ultra smartphone features a 108MP main camera with Night Mode capabilities. For best results in low light, enable Night Mode and keep the phone steady for 2-3 seconds during capture. Pro Mode allows manual adjustment of ISO (50-3200), shutter speed (1/5000-30s), and focus.", 
-        product: "smartphone",
-        category: "features",
-        embedding: [0.3, 0.4, 0.8, 0.1] 
-      },
-      { 
-        id: 6, 
-        title: "PixelPlus Ultra - Storage Management",
-        text: "When your PixelPlus Ultra storage is full, go to Settings > Storage to analyze space usage. Use the built-in Storage Manager to remove temporary files and cached data. You can also enable Cloud Backup to automatically offload photos and videos to your cloud account when storage drops below 15%.", 
-        product: "smartphone",
-        category: "maintenance",
-        embedding: [0.4, 0.5, 0.7, 0.2] 
-      },
-      { 
-        id: 7, 
-        title: "SmartView 4K - Screen Mirroring Setup",
-        text: "To mirror your device to the SmartView 4K TV, ensure both devices are on the same WiFi network. On your smartphone or laptop, open the screen mirroring function (called AirPlay on Apple devices, SmartView on Android). Select your TV from the list of available devices. For PC users, press Windows+K to open the casting menu.", 
-        product: "tv",
-        category: "setup",
-        embedding: [0.5, 0.3, 0.1, 0.8] 
-      },
-      { 
-        id: 8, 
-        title: "SmartView 4K - Sound Issues Troubleshooting",
-        text: "If you experience no sound or audio distortion on your SmartView 4K TV, first check if the mute function is active or volume is too low. Ensure external speakers are properly connected if applicable. For HDMI device audio issues, verify the HDMI-ARC setting is enabled in Sound Settings. A full restart of the TV can resolve most temporary audio glitches.", 
-        product: "tv",
-        category: "troubleshooting",
-        embedding: [0.6, 0.4, 0.2, 0.7] 
-      },
+    // ─── Constants ───
+    const STEP_COUNT = 5;
+    const TOP_K = 3;
+    const MIN_SIMILARITY = 0.3;
+    const RUN_DELAYS_MS = [500, 500, 500, 1000, 1000];
+    const LANG_KEY = 'rag-sim-lang';
+    const LANGS = ['pl', 'en'];
+    const PRODUCT_ICONS = { laptop: 'laptop', headphones: 'headphones', smartphone: 'smartphone', tv: 'monitor' };
+
+    // Keyword patterns shared by both languages, so a Polish or English question
+    // (and the Polish or English document text) lands on the same vector.
+    const RX = {
+      laptop:     /laptop|techx/,
+      headphones: /headphone|soundwave|słuchawk/,
+      phone:      /\b(smart)?phones?\b|pixelplus|telefon|smartfon/,
+      tv:         /\btv\b|smartview|telewizor/,
+      reset:      /reset|restart|freez|frozen|zawies/,
+      pair:       /\bpair|connect|bluetooth|sparow|parowa|połącz|podłącz/,
+      camera:     /camera|photo|aparat|zdję/,
+      screen:     /screen|display|audio|ekran|wyświetl|dźwięk/,
+      mirror:     /mirror|cast|screen|ekran|kopiow|przesyła/,
+    };
+    // Vector dimensions: laptop, headphones, phone, TV
+    const FEATURES = [
+      { rx: RX.laptop,     weights: [0.4, 0, 0, 0] },
+      { rx: RX.headphones, weights: [0, 0.4, 0, 0] },
+      { rx: RX.phone,      weights: [0, 0, 0.4, 0] },
+      { rx: RX.tv,         weights: [0, 0, 0, 0.4] },
+      { rx: RX.reset,      weights: [0.2, 0.1, 0, 0] },
+      { rx: RX.pair,       weights: [0, 0.3, 0, 0] },
+      { rx: RX.camera,     weights: [0, 0, 0.3, 0] },
+      { rx: RX.screen,     weights: [0, 0, 0, 0.2] },
     ];
-    
-    // Explicitly index (embed) documents using the same vectoriser as the query
-    function indexDocuments() {
-      indexedDocuments = documents.map(doc => {
-        const newEmbedding = embedQuery(doc.text);
-        return { ...doc, embedding: newEmbedding };
-      });
-      updateDocumentStore();
-      updateDocVisual();
+
+    const DOCS = [
+      { id: 1, product: 'laptop', category: 'troubleshooting',
+        title: { en: 'TechX Pro 13 - Troubleshooting Frozen System', pl: 'TechX Pro 13 – zawieszony system' },
+        text: {
+          en: 'If your TechX Pro 13 laptop freezes or becomes unresponsive, press and hold the power button for 10 seconds to force a shutdown. Wait 30 seconds before restarting. If the issue persists, try resetting the SMC by holding Shift+Control+Option and the power button simultaneously for 10 seconds.',
+          pl: 'Jeśli laptop TechX Pro 13 zawiesza się lub przestaje reagować, przytrzymaj przycisk zasilania przez 10 sekund, aby wymusić wyłączenie. Odczekaj 30 sekund przed ponownym włączeniem. Jeśli problem nie ustępuje, zresetuj SMC, przytrzymując jednocześnie Shift+Control+Option i przycisk zasilania przez 10 sekund.' } },
+      { id: 2, product: 'laptop', category: 'maintenance',
+        title: { en: 'TechX Pro 13 - Battery Optimization', pl: 'TechX Pro 13 – optymalizacja baterii' },
+        text: {
+          en: 'To maximize your TechX Pro 13 battery life, adjust your display brightness, close unused applications, and disable background processes. For best results, enable Battery Saver mode when below 20% charge. The battery is rated for 1000 charge cycles before degradation begins.',
+          pl: 'Aby wydłużyć czas pracy baterii TechX Pro 13, zmniejsz jasność ekranu, zamknij nieużywane aplikacje i wyłącz procesy działające w tle. Najlepsze efekty daje włączenie trybu oszczędzania baterii, gdy poziom naładowania spadnie poniżej 20%. Bateria wytrzymuje 1000 cykli ładowania, zanim zacznie tracić pojemność.' } },
+      { id: 3, product: 'headphones', category: 'setup',
+        title: { en: 'SoundWave X300 Headphones - Pairing Instructions', pl: 'Słuchawki SoundWave X300 – parowanie' },
+        text: {
+          en: "To pair your SoundWave X300 headphones with a new device, press and hold the multifunction button for 5 seconds until the LED flashes blue and red alternately. Enable Bluetooth on your device and select 'SoundWave X300' from the list of available devices. The LED will turn solid blue when successfully connected.",
+          pl: 'Aby sparować słuchawki SoundWave X300 z nowym urządzeniem, przytrzymaj przycisk wielofunkcyjny przez 5 sekund, aż dioda zacznie migać na przemian na niebiesko i czerwono. Włącz Bluetooth w urządzeniu i wybierz „SoundWave X300” z listy dostępnych urządzeń. Po udanym połączeniu dioda zaświeci stałym niebieskim światłem.' } },
+      { id: 4, product: 'headphones', category: 'troubleshooting',
+        title: { en: 'SoundWave X300 Headphones - Factory Reset', pl: 'Słuchawki SoundWave X300 – ustawienia fabryczne' },
+        text: {
+          en: 'To perform a factory reset on your SoundWave X300 headphones, press and hold both volume buttons simultaneously for 10 seconds while the headphones are powered on. The LED will flash purple three times to confirm the reset. Note that this will remove all paired devices from memory.',
+          pl: 'Aby przywrócić ustawienia fabryczne słuchawek SoundWave X300, przytrzymaj jednocześnie oba przyciski głośności przez 10 sekund przy włączonych słuchawkach. Dioda mignie trzy razy na fioletowo, potwierdzając reset. Pamiętaj, że operacja usunie z pamięci wszystkie sparowane urządzenia.' } },
+      { id: 5, product: 'smartphone', category: 'features',
+        title: { en: 'PixelPlus Ultra - Camera Settings', pl: 'PixelPlus Ultra – ustawienia aparatu' },
+        text: {
+          en: 'The PixelPlus Ultra smartphone features a 108MP main camera with Night Mode capabilities. For best results in low light, enable Night Mode and keep the phone steady for 2-3 seconds during capture. Pro Mode allows manual adjustment of ISO (50-3200), shutter speed (1/5000-30s), and focus.',
+          pl: 'Smartfon PixelPlus Ultra ma główny aparat 108 MP z trybem nocnym. Aby uzyskać najlepsze zdjęcia przy słabym oświetleniu, włącz tryb nocny i trzymaj telefon nieruchomo przez 2–3 sekundy podczas robienia zdjęcia. Tryb Pro pozwala ręcznie ustawić ISO (50–3200), czas naświetlania (1/5000–30 s) i ostrość.' } },
+      { id: 6, product: 'smartphone', category: 'maintenance',
+        title: { en: 'PixelPlus Ultra - Storage Management', pl: 'PixelPlus Ultra – zarządzanie pamięcią' },
+        text: {
+          en: 'When your PixelPlus Ultra storage is full, go to Settings > Storage to analyze space usage. Use the built-in Storage Manager to remove temporary files and cached data. You can also enable Cloud Backup to automatically offload photos and videos to your cloud account when storage drops below 15%.',
+          pl: 'Gdy pamięć PixelPlus Ultra się zapełni, przejdź do Ustawienia > Pamięć, aby sprawdzić, co zajmuje miejsce. Wbudowany Menedżer pamięci usunie pliki tymczasowe i dane z pamięci podręcznej. Możesz też włączyć kopię zapasową w chmurze, która automatycznie przeniesie zdjęcia i filmy na Twoje konto, gdy wolne miejsce spadnie poniżej 15%.' } },
+      { id: 7, product: 'tv', category: 'setup',
+        title: { en: 'SmartView 4K - Screen Mirroring Setup', pl: 'SmartView 4K – kopiowanie ekranu' },
+        text: {
+          en: 'To mirror your device to the SmartView 4K TV, ensure both devices are on the same WiFi network. On your smartphone or laptop, open the screen mirroring function (called AirPlay on Apple devices, SmartView on Android). Select your TV from the list of available devices. For PC users, press Windows+K to open the casting menu.',
+          pl: 'Aby wyświetlić obraz z urządzenia na telewizorze SmartView 4K, upewnij się, że oba urządzenia są w tej samej sieci Wi-Fi. Na smartfonie lub laptopie otwórz funkcję kopiowania ekranu (AirPlay w urządzeniach Apple, SmartView w Androidzie). Wybierz telewizor z listy dostępnych urządzeń. Na komputerze z Windows naciśnij Windows+K, aby otworzyć menu przesyłania.' } },
+      { id: 8, product: 'tv', category: 'troubleshooting',
+        title: { en: 'SmartView 4K - Sound Issues Troubleshooting', pl: 'SmartView 4K – problemy z dźwiękiem' },
+        text: {
+          en: 'If you experience no sound or audio distortion on your SmartView 4K TV, first check if the mute function is active or volume is too low. Ensure external speakers are properly connected if applicable. For HDMI device audio issues, verify the HDMI-ARC setting is enabled in Sound Settings. A full restart of the TV can resolve most temporary audio glitches.',
+          pl: 'Jeśli telewizor SmartView 4K nie odtwarza dźwięku lub dźwięk jest zniekształcony, najpierw sprawdź, czy nie jest włączone wyciszenie i czy głośność nie jest zbyt niska. Upewnij się, że zewnętrzne głośniki są prawidłowo podłączone. Przy problemach z dźwiękiem z urządzeń HDMI sprawdź, czy w Ustawieniach dźwięku włączona jest opcja HDMI-ARC. Pełny restart telewizora usuwa większość chwilowych usterek dźwięku.' } },
+    ];
+
+    const SAMPLES = {
+      en: [
+        'How do I reset my TechX Pro 13 laptop if it freezes?',
+        'How do I connect my SoundWave X300 headphones to my phone?',
+        'How can I mirror my laptop screen to my SmartView 4K TV?',
+        'What is the weather today?',
+      ],
+      pl: [
+        'Jak zresetować laptop TechX Pro 13, gdy się zawiesza?',
+        'Jak połączyć słuchawki SoundWave X300 z telefonem?',
+        'Jak wyświetlić ekran laptopa na telewizorze SmartView 4K?',
+        'Jaka jest dziś pogoda?',
+      ],
+    };
+
+    // Curated answers: used only when the question matches AND the source doc was retrieved
+    const TEMPLATES = [
+      { id: 'laptopFreeze', docId: 1, test: q => RX.laptop.test(q) && RX.reset.test(q) },
+      { id: 'headphonesPair', docId: 3, test: q => RX.headphones.test(q) && RX.pair.test(q) },
+      { id: 'tvMirror', docId: 7, test: q => RX.tv.test(q) && RX.mirror.test(q) },
+    ];
+
+    const T = {
+      pl: {
+        pageTitle: 'Symulator RAG dla wsparcia technicznego',
+        title: 'Symulator systemu RAG dla wsparcia technicznego',
+        lead: 'Zobacz krok po kroku, jak system RAG (Retrieval-Augmented Generation) odpowiada na pytanie klienta: indeksuje dokumenty, zamienia pytanie na wektor, wyszukuje najbardziej podobne instrukcje i dopiero na ich podstawie generuje odpowiedź.',
+        langSwitch: 'Język',
+        secQuery: 'Pytanie klienta',
+        queryLabel: 'Pytanie do wsparcia technicznego',
+        queryPlaceholder: 'Wpisz pytanie do działu wsparcia…',
+        run: 'Uruchom symulację',
+        next: 'Następny krok',
+        restart: 'Od nowa',
+        reset: 'Reset',
+        samplesLabel: 'Przykładowe pytania',
+        stepWord: 'Krok',
+        nextUp: 'Teraz',
+        finished: 'Gotowe – odpowiedź wygenerowana',
+        shortcutsLabel: 'Skróty:',
+        kRun: 'uruchom', kNext: 'następny krok', kReset: 'reset', kDocs: 'dokumenty', kLang: 'język',
+        secFlow: 'Przepływ RAG',
+        stage0: 'Baza wiedzy', stage1: 'Pytanie klienta', stage2: 'Model osadzeń', stage3: 'Wyszukiwarka', stage4: 'Generator odpowiedzi',
+        stage0Desc: 'Krok 0: dokumenty zamieniane na wektory tym samym modelem co pytania',
+        stage1Desc: 'Krok 1: klient wysyła pytanie',
+        stage2Desc: 'Krok 2: pytanie zamieniane na wektor semantyczny',
+        stage4Desc: 'Krok 4: odpowiedź oparta wyłącznie na znalezionych dokumentach',
+        chipIdle: 'czeka', chipActive: 'teraz', chipDone: 'gotowe',
+        kbIndexed: 'zindeksowano', kbNotIndexed: 'brak indeksu',
+        notIndexed: 'nie zindeksowano',
+        emptyQuery: '(puste pytanie)',
+        waitEmbed: 'Czekam, aż pytanie trafi do modelu…',
+        queryVector: 'Wektor zapytania',
+        waitRetrieve: 'Czekam na wektor zapytania…',
+        retrieveFoot: 'Krok 3: podobieństwo kosinusowe, próg {min}, maks. {k} dokumenty',
+        hitsMeta: '{n} z {total} dokumentów powyżej progu {min}',
+        noHits: 'Żaden dokument nie przekroczył progu podobieństwa.',
+        docShort: 'Dok.',
+        waitAnswer: 'Czekam na wyniki wyszukiwania…',
+        sources: 'Źródła:',
+        none: 'W bazie wiedzy nie ma dokumentów pasujących do tego pytania, więc system nie odpowie. Lepiej przyznać się do braku danych niż zgadywać.',
+        combineIntro: 'Na podstawie dostępnych informacji:',
+        laptopFreeze: 'Jeśli laptop TechX Pro 13 zawiesił się lub nie reaguje:\n\n1. Przytrzymaj przycisk zasilania przez 10 sekund, aby wymusić wyłączenie.\n2. Odczekaj co najmniej 30 sekund przed ponownym włączeniem.\n3. Jeśli to nie pomoże, zresetuj SMC: przytrzymaj jednocześnie Shift+Control+Option i przycisk zasilania przez 10 sekund.\n\nJeśli problem wraca, może to oznaczać usterkę sprzętu wymagającą serwisu.',
+        headphonesPair: 'Aby sparować słuchawki SoundWave X300 z nowym urządzeniem:\n\n1. Przytrzymaj przycisk wielofunkcyjny przez 5 sekund, aż dioda zacznie migać na niebiesko i czerwono.\n2. Włącz Bluetooth w swoim urządzeniu.\n3. Wybierz „SoundWave X300” z listy dostępnych urządzeń.\n4. Stałe niebieskie światło diody oznacza udane połączenie.\n\nJeśli połączenie się nie udaje, zresetuj słuchawki, przytrzymując oba przyciski głośności przez 10 sekund.',
+        tvMirror: 'Aby wyświetlić ekran na telewizorze SmartView 4K:\n\n1. Upewnij się, że urządzenie i telewizor są w tej samej sieci Wi-Fi.\n2. Otwórz funkcję kopiowania ekranu (AirPlay w urządzeniach Apple, SmartView w Androidzie).\n3. Wybierz telewizor z listy dostępnych urządzeń.\n4. Na komputerze z Windows naciśnij Windows+K, aby otworzyć menu przesyłania.\n\nJeśli pojawią się problemy z połączeniem, uruchom ponownie urządzenie i telewizor.',
+        secDocs: 'Dokumenty w bazie wiedzy',
+        embedDocs: 'Zindeksuj dokumenty',
+        showDocs: 'Pokaż dokumenty', hideDocs: 'Ukryj dokumenty',
+        vector: 'Wektor',
+        dims: ['laptop', 'słuchawki', 'telefon', 'TV'],
+        categories: { troubleshooting: 'problemy', maintenance: 'konserwacja', setup: 'konfiguracja', features: 'funkcje' },
+        secHow: 'Jak działa ten system',
+        how1Title: 'Indeksowanie dokumentów',
+        how1: 'System zamienia dokumenty wsparcia na wektory tym samym modelem, którego używa dla pytań, i zapisuje je w bazie wektorowej.',
+        how2Title: 'Zrozumienie pytania',
+        how2: 'Pytanie klienta zamienia się w wektor semantyczny: każda liczba mówi, jak mocno pytanie dotyczy danego tematu.',
+        how3Title: 'Wyszukiwanie dokumentów',
+        how3: 'System liczy podobieństwo wektora pytania do każdego dokumentu i bierze najbardziej podobne, powyżej progu.',
+        how4Title: 'Generowanie odpowiedzi',
+        how4: 'Model łączy znalezione informacje techniczne z pytaniem klienta i pisze konkretną odpowiedź, wskazując źródła.',
+        howNote: 'Jeśli pytanie nie dotyczy bazy wiedzy (np. pytanie o pogodę), żaden dokument nie przekroczy progu podobieństwa, a system powie, że nie ma danych, zamiast zgadywać.',
+        liveIndexed: 'Zindeksowano {n} dokumentów.',
+        liveQuery: 'Pytanie przyjęte.',
+        liveEmbedded: 'Pytanie zamienione na wektor.',
+        liveRetrieved: 'Znaleziono dokumenty: {n}.',
+        liveAnswered: 'Odpowiedź wygenerowana.',
+        liveReset: 'Symulacja zresetowana.',
+      },
+      en: {
+        pageTitle: 'Tech Support RAG System Simulator',
+        title: 'Tech Support RAG System Simulator',
+        lead: 'Follow, step by step, how a RAG (Retrieval-Augmented Generation) system answers a customer question: it indexes the documents, turns the question into a vector, retrieves the most similar instructions and only then generates an answer from them.',
+        langSwitch: 'Language',
+        secQuery: 'Customer query',
+        queryLabel: 'Support question',
+        queryPlaceholder: 'Type your support question here…',
+        run: 'Run simulation',
+        next: 'Next step',
+        restart: 'Start over',
+        reset: 'Reset',
+        samplesLabel: 'Sample queries',
+        stepWord: 'Step',
+        nextUp: 'Now',
+        finished: 'Done – answer generated',
+        shortcutsLabel: 'Shortcuts:',
+        kRun: 'run', kNext: 'next step', kReset: 'reset', kDocs: 'documents', kLang: 'language',
+        secFlow: 'RAG pipeline',
+        stage0: 'Knowledge base', stage1: 'Customer query', stage2: 'Embedding model', stage3: 'Retriever', stage4: 'Response generator',
+        stage0Desc: 'Step 0: documents embedded with the same model as the queries',
+        stage1Desc: 'Step 1: customer submits a support question',
+        stage2Desc: 'Step 2: convert the query to a semantic vector',
+        stage4Desc: 'Step 4: answer grounded only in the retrieved documents',
+        chipIdle: 'waiting', chipActive: 'now', chipDone: 'done',
+        kbIndexed: 'indexed', kbNotIndexed: 'not indexed',
+        notIndexed: 'not indexed',
+        emptyQuery: '(empty query)',
+        waitEmbed: 'Waiting for the query to process…',
+        queryVector: 'Query vector',
+        waitRetrieve: 'Waiting for the query vector…',
+        retrieveFoot: 'Step 3: cosine similarity, threshold {min}, up to {k} documents',
+        hitsMeta: '{n} of {total} documents above the {min} threshold',
+        noHits: 'No document passed the similarity threshold.',
+        docShort: 'Doc',
+        waitAnswer: 'Waiting for retrieval…',
+        sources: 'Sources:',
+        none: 'The knowledge base has no documents that match this question, so the system will not answer it. Admitting missing data beats guessing.',
+        combineIntro: 'Based on the information I have:',
+        laptopFreeze: "If your TechX Pro 13 laptop is frozen or unresponsive, you should:\n\n1. Press and hold the power button for 10 seconds to force a shutdown\n2. Wait at least 30 seconds before turning it back on\n3. If this doesn't resolve the issue, try resetting the SMC by holding Shift+Control+Option and the power button simultaneously for 10 seconds\n\nIf the problem persists, it might indicate a more serious hardware issue requiring service.",
+        headphonesPair: "To pair your SoundWave X300 headphones with a new device:\n\n1. Press and hold the multifunction button for 5 seconds until the LED flashes blue and red alternately\n2. Enable Bluetooth on your device\n3. Select 'SoundWave X300' from the list of available devices\n4. The LED will turn solid blue when successfully connected\n\nIf you're having trouble connecting, try resetting your headphones by holding both volume buttons for 10 seconds.",
+        tvMirror: "To mirror your screen to a SmartView 4K TV:\n\n1. Make sure both your device and TV are connected to the same WiFi network\n2. On your device, open the screen mirroring function (AirPlay on Apple, SmartView on Android)\n3. Select your TV from the list of available devices\n4. For Windows PC, press Windows+K to open the casting menu\n\nIf you're having connection issues, try restarting both your device and TV.",
+        secDocs: 'Knowledge base documents',
+        embedDocs: 'Embed documents',
+        showDocs: 'Show documents', hideDocs: 'Hide documents',
+        vector: 'Vector',
+        dims: ['laptop', 'headphones', 'phone', 'TV'],
+        categories: { troubleshooting: 'troubleshooting', maintenance: 'maintenance', setup: 'setup', features: 'features' },
+        secHow: 'How this RAG system works',
+        how1Title: 'Document indexing',
+        how1: 'The system embeds the support documents with the same vectoriser it uses for user queries and stores them in a vector database.',
+        how2Title: 'Query understanding',
+        how2: "The customer's question becomes a semantic vector: each number says how strongly the question is about a given topic.",
+        how3Title: 'Document retrieval',
+        how3: 'The system scores the query vector against every document and keeps the most similar ones above a threshold.',
+        how4Title: 'Response generation',
+        how4: "The model combines the retrieved technical information with the customer's question and writes a specific answer, citing its sources.",
+        howNote: 'If the question is off-topic (for example, a weather question), no document passes the similarity threshold and the system says it has no data instead of guessing.',
+        liveIndexed: 'Indexed {n} documents.',
+        liveQuery: 'Query accepted.',
+        liveEmbedded: 'Query converted to a vector.',
+        liveRetrieved: 'Documents retrieved: {n}.',
+        liveAnswered: 'Answer generated.',
+        liveReset: 'Simulation reset.',
+      },
+    };
+
+    // ─── State ───
+    const savedLang = localStorage.getItem(LANG_KEY);
+    const state = {
+      lang: LANGS.includes(savedLang) ? savedLang : 'pl',
+      step: 0,             // 0..4 = stage about to run, 5 = finished
+      running: false,
+      query: '',
+      docVectors: null,    // { [docId]: number[] } once indexed
+      queryVector: null,
+      scores: [],          // every doc with its similarity, sorted desc
+      retrieved: [],       // docs above MIN_SIMILARITY, top K
+      answer: null,        // { kind: 'none' } | { kind: 'template', id, docIds } | { kind: 'combine', docIds }
+      docsOpen: true,
+    };
+    state.query = SAMPLES[state.lang][0];
+
+    // ─── DOM refs ───
+    const $ = id => document.getElementById(id);
+    const queryInput = $('queryInput');
+    const runButton = $('runButton');
+    const nextButton = $('nextButton');
+    const nextLabel = $('nextLabel');
+    const resetButton = $('resetButton');
+    const samplesEl = $('samples');
+    const progressLabel = $('progressLabel');
+    const progressBar = $('progressBar');
+    const progressFill = $('progressFill');
+    const progressStatus = $('progressStatus');
+    const shortcutsEl = $('shortcuts');
+    const liveEl = $('live');
+    const kbBody = $('kbBody');
+    const kbStatus = $('kbStatus');
+    const queryBody = $('queryBody');
+    const embedBody = $('embedBody');
+    const retrieveBody = $('retrieveBody');
+    const retrieveFoot = $('retrieveFoot');
+    const answerBody = $('answerBody');
+    const answerSources = $('answerSources');
+    const embedDocsButton = $('embedDocsButton');
+    const toggleDocsButton = $('toggleDocsButton');
+    const toggleDocsLabel = $('toggleDocsLabel');
+    const docGrid = $('docGrid');
+    const stageEls = [...document.querySelectorAll('.stage')];
+    const langButtons = [...document.querySelectorAll('.edu-seg button')];
+
+    // ─── Helpers ───
+    function t(key, vars) {
+      let s = T[state.lang][key] ?? T.en[key] ?? key;
+      if (vars && typeof s === 'string') Object.entries(vars).forEach(([k, v]) => { s = s.replaceAll('{' + k + '}', v); });
+      return s;
     }
-    
-    // Update the Knowledge Base box in the simulation flow
-    function updateDocumentStore() {
-      const container = document.getElementById('documentStoreContent');
-      container.innerHTML = '';
-      indexedDocuments.forEach(doc => {
-        const div = document.createElement('div');
-        div.className = "mb-2 p-1 bg-gray-100 rounded flex flex-col";
-        div.innerHTML = 
-          '<div class="flex items-center space-x-1">' +
-            getProductIcon(doc.product) +
-            '<div class="font-medium text-xs truncate">' + doc.title + '</div>' +
-          '</div>' +
-          '<div class="text-[10px] text-gray-500">[' + doc.embedding.map(v => v.toFixed(3)).join(', ') + ']</div>';
-        container.appendChild(div);
-      });
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const icon = (name, cls = 'ic') => `<i data-lucide="${name}" class="${cls}" aria-hidden="true"></i>`;
+    const fmt = v => v.toFixed(3);
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const docById = id => DOCS.find(d => d.id === id);
+
+    function embed(text) {
+      const lower = text.toLowerCase();
+      const v = [0, 0, 0, 0];
+      FEATURES.forEach(f => { if (f.rx.test(lower)) f.weights.forEach((w, i) => { v[i] += w; }); });
+      const sum = v.reduce((a, b) => a + b, 0);
+      return sum ? v.map(x => x / sum) : v;
     }
-    
-    // Update the Documents Visual Representation container (accordion)
-    function updateDocVisual() {
-      const container = document.getElementById('docVisualContainer');
-      container.innerHTML = '';
-      if (indexedDocuments.length === 0) {
-        container.innerHTML = '<div class="text-gray-500 italic">Documents have not been embedded yet.</div>';
-        return;
-      }
-      indexedDocuments.forEach(doc => {
-        const card = document.createElement('div');
-        card.className = "p-4 border rounded-lg bg-gray-50";
-        card.innerHTML = `
-          <div class="flex items-center space-x-2">
-            ${getProductIcon(doc.product)}
-            <span class="font-bold text-sm">${doc.title}</span>
-          </div>
-          <div class="mt-1 text-xs text-gray-600">Vector: [${doc.embedding.map(v => v.toFixed(3)).join(', ')}]</div>
-          <div class="mt-1 text-xs text-gray-500">${doc.text}</div>
-        `;
-        container.appendChild(card);
-      });
+
+    function cosine(a, b) {
+      let dot = 0, ma = 0, mb = 0;
+      for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; ma += a[i] * a[i]; mb += b[i] * b[i]; }
+      return ma && mb ? dot / (Math.sqrt(ma) * Math.sqrt(mb)) : 0;
     }
-    
-    // Get a product icon (using Lucide) based on product type
-    function getProductIcon(product) {
-      let iconName = '';
-      switch(product) {
-        case 'laptop': iconName = 'laptop'; break;
-        case 'headphones': iconName = 'headphones'; break;
-        case 'smartphone': iconName = 'smartphone'; break;
-        case 'tv': iconName = 'monitor'; break;
-        default: iconName = 'file-text';
-      }
-      return '<i data-lucide="'+iconName+'" class="h-4 w-4"></i>';
+
+    function indexDocs() {
+      // Index the English source text; the Polish translation maps to the same vector.
+      state.docVectors = Object.fromEntries(DOCS.map(d => [d.id, embed(d.text.en)]));
     }
-    
-    // Simulate embedding the query text into a vector
-    function embedQuery(text) {
-      let embedding = [0.5, 0.5, 0.5, 0.5];
-      const textLower = text.toLowerCase();
-      if (textLower.includes('laptop') || textLower.includes('techx')) {
-        embedding[0] += 0.4;
-      }
-      if (textLower.includes('headphone') || textLower.includes('soundwave')) {
-        embedding[1] += 0.4;
-      }
-      if (textLower.includes('phone') || textLower.includes('pixelplus')) {
-        embedding[2] += 0.4;
-      }
-      if (textLower.includes('tv') || textLower.includes('smartview')) {
-        embedding[3] += 0.4;
-      }
-      if (textLower.includes('reset') || textLower.includes('restart') || textLower.includes('freeze')) {
-        embedding[0] += 0.2;
-        embedding[1] += 0.1;
-      }
-      if (textLower.includes('pair') || textLower.includes('connect') || textLower.includes('bluetooth')) {
-        embedding[1] += 0.3;
-      }
-      if (textLower.includes('camera') || textLower.includes('photo')) {
-        embedding[2] += 0.3;
-      }
-      if (textLower.includes('screen') || textLower.includes('display') || textLower.includes('audio')) {
-        embedding[3] += 0.2;
-      }
-      const sum = embedding.reduce((a, b) => a + b, 0);
-      return embedding.map(v => v / sum);
+
+    function retrieveDocs() {
+      state.scores = DOCS
+        .map(d => ({ id: d.id, similarity: cosine(state.queryVector, state.docVectors[d.id]) }))
+        .sort((a, b) => b.similarity - a.similarity);
+      state.retrieved = state.scores.filter(s => s.similarity >= MIN_SIMILARITY).slice(0, TOP_K);
     }
-    
-    // Find the most similar documents using cosine similarity
-    function findSimilarDocuments(queryVector, docs, topK = 3) {
-      function calculateSimilarity(v1, v2) {
-        let dotProduct = 0, mag1 = 0, mag2 = 0;
-        for (let i = 0; i < v1.length; i++) {
-          dotProduct += v1[i] * v2[i];
-          mag1 += v1[i] * v1[i];
-          mag2 += v2[i] * v2[i];
-        }
-        mag1 = Math.sqrt(mag1);
-        mag2 = Math.sqrt(mag2);
-        return dotProduct / (mag1 * mag2);
-      }
-      return docs
-        .map(doc => ({ ...doc, similarity: calculateSimilarity(queryVector, doc.embedding) }))
-        .sort((a, b) => b.similarity - a.similarity)
-        .slice(0, topK);
+
+    function generateAnswer() {
+      if (!state.retrieved.length) return { kind: 'none' };
+      const q = state.query.toLowerCase();
+      const hitIds = state.retrieved.map(r => r.id);
+      const tpl = TEMPLATES.find(x => x.test(q) && hitIds.includes(x.docId));
+      if (tpl) return { kind: 'template', id: tpl.id, docIds: [tpl.docId] };
+      return { kind: 'combine', docIds: hitIds };
     }
-    
-    // Generate a response based on retrieved documents and the query.
-    // If the query contains "weather", answer that no weather information is available.
-    function generateResponse(retrievedDocs, userQuery) {
-      const queryLower = userQuery.toLowerCase();
-      if(queryLower.includes("weather")){
-        return "There is no information about weather in provided documents.";
-      }
-      
-      if (retrievedDocs.length === 0 || (retrievedDocs[0] && retrievedDocs[0].similarity < 0.2)) {
-        return "I don't have enough information to answer your question. Could you provide more details about the product you're having issues with?";
-      }
-      
-      // Laptop freezing issue
-      if ((queryLower.includes('laptop') || queryLower.includes('techx')) &&
-          (queryLower.includes('freeze') || queryLower.includes('frozen') || queryLower.includes('restart') || queryLower.includes('reset'))) {
-        if (retrievedDocs.some(doc => doc.id === 1)) {
-          return "If your TechX Pro 13 laptop is frozen or unresponsive, you should:\n\n1. Press and hold the power button for 10 seconds to force a shutdown\n2. Wait at least 30 seconds before turning it back on\n3. If this doesn't resolve the issue, try resetting the SMC by holding Shift+Control+Option and the power button simultaneously for 10 seconds\n\nIf the problem persists, it might indicate a more serious hardware issue requiring service.";
-        }
-      }
-      
-      // Headphone pairing issue
-      if ((queryLower.includes('headphone') || queryLower.includes('soundwave')) &&
-          (queryLower.includes('pair') || queryLower.includes('connect') || queryLower.includes('bluetooth'))) {
-        if (retrievedDocs.some(doc => doc.id === 3)) {
-          return "To pair your SoundWave X300 headphones with a new device:\n\n1. Press and hold the multifunction button for 5 seconds until the LED flashes blue and red alternately\n2. Enable Bluetooth on your device\n3. Select 'SoundWave X300' from the list of available devices\n4. The LED will turn solid blue when successfully connected\n\nIf you're having trouble connecting, try resetting your headphones by holding both volume buttons for 10 seconds.";
-        }
-      }
-      
-      // TV mirroring
-      if ((queryLower.includes('tv') || queryLower.includes('smartview')) &&
-          (queryLower.includes('mirror') || queryLower.includes('cast') || queryLower.includes('screen'))) {
-        if (retrievedDocs.some(doc => doc.id === 7)) {
-          return "To mirror your screen to a SmartView 4K TV:\n\n1. Make sure both your device and TV are connected to the same WiFi network\n2. On your device, open the screen mirroring function (AirPlay on Apple, SmartView on Android)\n3. Select your TV from the list of available devices\n4. For Windows PC, press Windows+K to open the casting menu\n\nIf you're having connection issues, try restarting both your device and TV.";
-        }
-      }
-      
-      // Default: Combine information from retrieved documents.
-      let response = "Based on the information I have:";
-      retrievedDocs.forEach(doc => {
-        response += "\n\n" + doc.title + ":\n" + doc.text;
-      });
-      
-      return response;
+
+    function clearPipeline() {
+      state.queryVector = null;
+      state.scores = [];
+      state.retrieved = [];
+      state.answer = null;
     }
-    
-    // Update the UI based on the current simulation step
-    function updateUI() {
-      // Update customer query text
-      document.getElementById('customerQueryContent').innerText = query;
-      
-      // Update embedding model box
-      if (queryEmbedding) {
-        document.getElementById('embeddingModelContent').innerText = "[" + queryEmbedding.map(v => v.toFixed(3)).join(', ') + "]";
-      } else {
-        document.getElementById('embeddingModelContent').innerHTML = '<span class="italic">Waiting for query to process...</span>';
-      }
-      
-      // Update retriever box
-      const retrieverEl = document.getElementById('retrieverContent');
-      retrieverEl.innerHTML = '';
-      if (retrievedDocs.length > 0) {
-        retrievedDocs.forEach(doc => {
-          const div = document.createElement('div');
-          div.className = "mb-2 p-2 bg-green-50 rounded text-xs";
-          div.innerHTML = '<div class="font-medium flex items-center gap-1">' + 
-            getProductIcon(doc.product) + 
-            '<span>Doc ' + doc.id + ' (' + (doc.similarity * 100).toFixed(1) + '%)</span></div>' +
-            '<div class="text-xs truncate">' + doc.title + '</div>';
-          retrieverEl.appendChild(div);
-        });
-      } else {
-        retrieverEl.innerHTML = '<div class="p-2 bg-gray-50 rounded text-xs italic">Waiting for embedding...</div>';
-      }
-      
-      // Update response generator box
-      const responseEl = document.getElementById('responseGeneratorContent');
-      if (generatedResponse) {
-        responseEl.innerHTML = '<div class="p-2 bg-red-50 rounded text-xs whitespace-pre-wrap">' + generatedResponse + '</div>';
-      } else {
-        responseEl.innerHTML = '<div class="p-2 bg-gray-50 rounded text-xs italic">Waiting for retrieval...</div>';
-      }
-      
-      // Highlight the active step box:
-      // Step 0: Document Indexing, Step 1: Customer Query, Step 2: Query Embedding,
-      // Step 3: Document Retrieval, Step 4: Response Generation.
-      document.getElementById('documentStoreBox').className = "relative p-4 border-2 rounded-lg w-60 " + (currentStep === 0 ? "border-blue-500 bg-blue-50" : "border-gray-300");
-      document.getElementById('customerQueryBox').className = "p-4 border-2 rounded-lg w-60 " + (currentStep === 1 ? "border-blue-500 bg-blue-50" : "border-gray-300");
-      document.getElementById('embeddingModelBox').className = "p-4 border-2 rounded-lg w-60 " + (currentStep === 2 ? "border-blue-500 bg-blue-50" : "border-gray-300");
-      document.getElementById('retrieverBox').className = "p-4 border-2 rounded-lg w-60 " + (currentStep === 3 ? "border-blue-500 bg-blue-50" : "border-gray-300");
-      document.getElementById('responseGeneratorBox').className = "p-4 border-2 rounded-lg w-60 " + (currentStep === 4 ? "border-blue-500 bg-blue-50" : "border-gray-300");
-      
-      // Update button text based on step. At step 5, button shows "Reset"
-      const nextStepButton = document.getElementById('nextStepButton');
-      nextStepButton.innerText = (currentStep === 5 ? "Reset" : "Next Step");
-      document.getElementById('runSimulationButton').disabled = isRunning;
-      document.getElementById('nextStepButton').disabled = isRunning;
-      
-      // Refresh Lucide icons after DOM changes
-      if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-      }
-      
-      // If document indexing is done, update the document store content
-      if (currentStep > 0) {
-        updateDocumentStore();
-      }
+
+    // The query changed: drop everything computed from the old one
+    function invalidateQuery() {
+      clearPipeline();
+      if (state.step > 1) state.step = 1;
     }
-    
-    // Run one simulation step (manual stepping)
-    function runStep() {
-      if (isRunning) return;
-      switch(currentStep) {
-        case 0:
-          // Step 0: Index documents
-          indexDocuments();
-          currentStep = 1;
-          break;
-        case 1:
-          // Step 1: Customer Query is already displayed; move to query embedding.
-          currentStep = 2;
-          break;
-        case 2:
-          // Step 2: Embed customer query.
-          queryEmbedding = embedQuery(query);
-          currentStep = 3;
-          break;
-        case 3:
-          // Step 3: Retrieve similar documents from the indexed documents.
-          retrievedDocs = findSimilarDocuments(queryEmbedding, indexedDocuments);
-          currentStep = 4;
-          break;
-        case 4:
-          // Step 4: Generate response.
-          generatedResponse = generateResponse(retrievedDocs, query);
-          currentStep = 5;
-          break;
-        case 5:
-          // Step 5: Reset simulation state.
-          currentStep = 0;
-          queryEmbedding = null;
-          retrievedDocs = [];
-          generatedResponse = '';
-          break;
-      }
-      updateUI();
+
+    function announce(key, vars) { liveEl.textContent = t(key, vars); }
+
+    const STEP_ACTIONS = [
+      () => { indexDocs(); announce('liveIndexed', { n: DOCS.length }); },
+      () => announce('liveQuery'),
+      () => { state.queryVector = embed(state.query); announce('liveEmbedded'); },
+      () => { retrieveDocs(); announce('liveRetrieved', { n: state.retrieved.length }); },
+      () => { state.answer = generateAnswer(); announce('liveAnswered'); },
+    ];
+
+    function advance() {
+      if (state.running) return;
+      if (state.step === STEP_COUNT) { resetSimulation(); return; }
+      STEP_ACTIONS[state.step]();
+      state.step++;
+      render();
     }
-    
-    // Run the entire simulation automatically with delays
+
     async function runSimulation() {
-      if (isRunning) return;
-      isRunning = true;
-      currentStep = 0;
-      queryEmbedding = null;
-      retrievedDocs = [];
-      generatedResponse = '';
-      updateUI();
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      // Step 0: Index documents
-      indexDocuments();
-      currentStep = 1;
-      updateUI();
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      // Step 1: (Customer query is already shown)
-      currentStep = 2;
-      updateUI();
-      
-      await new Promise(resolve => setTimeout(resolve, 500));
-      // Step 2: Embed query
-      queryEmbedding = embedQuery(query);
-      currentStep = 3;
-      updateUI();
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Step 3: Retrieve similar documents
-      retrievedDocs = findSimilarDocuments(queryEmbedding, indexedDocuments);
-      currentStep = 4;
-      updateUI();
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Step 4: Generate response
-      generatedResponse = generateResponse(retrievedDocs, query);
-      currentStep = 5;
-      updateUI();
-      
-      isRunning = false;
-      updateUI();
+      if (state.running) return;
+      state.running = true;
+      clearPipeline();
+      state.step = 0;
+      render();
+      for (let i = 0; i < STEP_COUNT; i++) {
+        await sleep(RUN_DELAYS_MS[i]);
+        STEP_ACTIONS[i]();
+        state.step = i + 1;
+        render();
+      }
+      state.running = false;
+      render();
     }
-    
-    // Event listeners
-    document.getElementById('runSimulationButton').addEventListener('click', runSimulation);
-    document.getElementById('nextStepButton').addEventListener('click', runStep);
-    document.getElementById('queryInput').addEventListener('input', function(e) {
-      query = e.target.value;
-      updateUI();
-    });
-    document.getElementById('embedDocumentsButton').addEventListener('click', function() {
-      indexDocuments();
-      updateDocVisual();
-    });
-    document.getElementById('toggleAccordionButton').addEventListener('click', function() {
-      document.getElementById('docVisualContainer').classList.toggle('hidden');
-    });
-    document.querySelectorAll('.sampleQuery').forEach(button => {
-      button.addEventListener('click', function() {
-        query = this.getAttribute('data-query');
-        document.getElementById('queryInput').value = query;
-        currentStep = 0;
-        queryEmbedding = null;
-        retrievedDocs = [];
-        generatedResponse = '';
-        updateUI();
+
+    function resetSimulation() {
+      if (state.running) return;
+      clearPipeline();
+      state.step = 0;
+      announce('liveReset');
+      render();
+    }
+
+    function setQuery(q) {
+      if (state.running) return;
+      state.query = q;
+      if (queryInput.value !== q) queryInput.value = q;
+      invalidateQuery();
+      render();
+    }
+
+    function setLang(lang) {
+      if (lang === state.lang) return;
+      const sampleIdx = SAMPLES[state.lang].indexOf(state.query);
+      state.lang = lang;
+      localStorage.setItem(LANG_KEY, lang);
+      if (sampleIdx >= 0 && !state.running) {
+        state.query = SAMPLES[lang][sampleIdx];
+        queryInput.value = state.query;
+        invalidateQuery();
+      }
+      applyStaticText();
+      render();
+    }
+
+    function toggleDocs() {
+      state.docsOpen = !state.docsOpen;
+      render();
+    }
+
+    // ─── Render ───
+    function applyStaticText() {
+      document.documentElement.lang = state.lang;
+      document.title = t('pageTitle');
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+      document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+      shortcutsEl.innerHTML = `<span>${esc(t('shortcutsLabel'))}</span>` +
+        [['Enter', 'kRun'], ['N', 'kNext'], ['R', 'kReset'], ['D', 'kDocs'], ['L', 'kLang']]
+          .map(([k, label]) => `<span><kbd>${k}</kbd> ${esc(t(label))}</span>`).join('');
+    }
+
+    function vectorBars(v) {
+      const dims = t('dims');
+      return `<div class="vec">${v.map((x, i) =>
+        `<div class="vec-row"><span>${esc(dims[i])}</span><span class="track"><span style="width:${(x * 100).toFixed(1)}%"></span></span><span class="val">${x.toFixed(2)}</span></div>`
+      ).join('')}</div>`;
+    }
+
+    const rawVector = v => `[${v.map(fmt).join(', ')}]`;
+
+    function renderControls() {
+      document.body.dataset.step = state.step;
+      document.body.dataset.running = state.running;
+      document.body.dataset.indexed = !!state.docVectors;
+      document.body.dataset.lang = state.lang;
+      langButtons.forEach(b => {
+        const on = b.dataset.lang === state.lang;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on);
       });
+      queryInput.readOnly = state.running;
+      runButton.disabled = state.running;
+      nextButton.disabled = state.running;
+      resetButton.disabled = state.running;
+      embedDocsButton.disabled = state.running;
+      nextLabel.textContent = state.step === STEP_COUNT ? t('restart') : t('next');
+
+      samplesEl.innerHTML = SAMPLES[state.lang].map((q, i) =>
+        `<button type="button" class="sample" data-sample="${i}" aria-pressed="${q === state.query}"${state.running ? ' disabled' : ''}>${esc(q)}</button>`
+      ).join('');
+
+      progressLabel.textContent = `${t('stepWord')} ${state.step}/${STEP_COUNT}`;
+      progressFill.style.width = (state.step / STEP_COUNT * 100) + '%';
+      progressBar.setAttribute('aria-valuenow', state.step);
+      progressStatus.textContent = state.step < STEP_COUNT ? `${t('nextUp')}: ${t('stage' + state.step)}` : t('finished');
+    }
+
+    function renderStages() {
+      stageEls.forEach(el => {
+        const i = Number(el.dataset.stage);
+        const s = i < state.step ? 'done' : i === state.step ? 'active' : 'idle';
+        el.dataset.state = s;
+        const chip = el.querySelector('[data-chip]');
+        chip.className = 'edu-chip ' + { idle: 'chip-stone', active: 'chip-yellow', done: 'chip-green' }[s];
+        chip.textContent = t({ idle: 'chipIdle', active: 'chipActive', done: 'chipDone' }[s]);
+      });
+
+      // Knowledge base
+      const hitRank = Object.fromEntries(state.retrieved.map((r, i) => [r.id, i + 1]));
+      kbStatus.textContent = state.docVectors ? `${DOCS.length} · ${t('kbIndexed')}` : t('kbNotIndexed');
+      kbBody.innerHTML = `<div class="kb-grid">${DOCS.map(d => `
+        <div class="kb-doc" data-doc-id="${d.id}" data-hit="${!!hitRank[d.id]}">
+          <div class="kb-doc-top">
+            <span class="kb-doc-title">${icon(PRODUCT_ICONS[d.product])}<span>${esc(d.title[state.lang])}</span></span>
+            ${hitRank[d.id] ? `<span class="edu-chip chip-yellow">#${hitRank[d.id]}</span>` : ''}
+          </div>
+          <span class="kb-doc-vec">${state.docVectors ? rawVector(state.docVectors[d.id]) : esc(t('notIndexed'))}</span>
+        </div>`).join('')}</div>`;
+
+      // Query
+      queryBody.innerHTML = `<div class="well"></div>`;
+      queryBody.firstChild.textContent = state.query.trim() ? state.query : t('emptyQuery');
+
+      // Embedding
+      embedBody.innerHTML = state.queryVector
+        ? `<p class="edu-overline">${esc(t('queryVector'))}</p>${vectorBars(state.queryVector)}<p class="raw-vec">${rawVector(state.queryVector)}</p>`
+        : `<p class="waiting">${esc(t('waitEmbed'))}</p>`;
+
+      // Retriever
+      retrieveFoot.textContent = t('retrieveFoot', { min: MIN_SIMILARITY.toFixed(2), k: TOP_K });
+      if (!state.scores.length) {
+        retrieveBody.innerHTML = `<p class="waiting">${esc(t('waitRetrieve'))}</p>`;
+      } else {
+        const above = state.scores.filter(s => s.similarity >= MIN_SIMILARITY).length;
+        const meta = `<p class="hit-meta">${esc(t('hitsMeta', { n: above, total: DOCS.length, min: MIN_SIMILARITY.toFixed(2) }))}</p>`;
+        retrieveBody.innerHTML = meta + (state.retrieved.length
+          ? `<div class="hits scroll">${state.retrieved.map(r => {
+              const d = docById(r.id);
+              return `<div class="hit" data-doc-id="${d.id}" data-similarity="${r.similarity.toFixed(4)}">
+                <div class="hit-top"><span>${icon(PRODUCT_ICONS[d.product])}${esc(t('docShort'))} ${d.id}</span><span>${(r.similarity * 100).toFixed(1)}%</span></div>
+                <span class="track"><span style="width:${(r.similarity * 100).toFixed(1)}%"></span></span>
+                <span class="hit-title">${esc(d.title[state.lang])}</span>
+              </div>`;
+            }).join('')}</div>`
+          : `<p class="waiting">${esc(t('noHits'))}</p>`);
+      }
+
+      // Answer
+      const a = state.answer;
+      answerBody.dataset.answerKind = a ? a.kind : 'pending';
+      answerSources.innerHTML = '';
+      if (!a) {
+        answerBody.innerHTML = `<p class="waiting">${esc(t('waitAnswer'))}</p>`;
+      } else if (a.kind === 'none') {
+        answerBody.innerHTML = `<div class="note-block tone-blue edu-block">${icon('info')}<p>${esc(t('none'))}</p></div>`;
+      } else {
+        const text = a.kind === 'template'
+          ? t(a.id)
+          : [t('combineIntro'), ...a.docIds.map(id => { const d = docById(id); return `${d.title[state.lang]}:\n${d.text[state.lang]}`; })].join('\n\n');
+        answerBody.innerHTML = `<p class="answer scroll"></p>`;
+        answerBody.firstChild.textContent = text;
+        answerSources.innerHTML = `<span class="progress-status">${esc(t('sources'))}</span>` +
+          a.docIds.map(id => `<span class="edu-chip chip-blue">${esc(t('docShort'))} ${id}</span>`).join('');
+      }
+    }
+
+    function renderDocs() {
+      toggleDocsButton.setAttribute('aria-expanded', state.docsOpen);
+      toggleDocsLabel.textContent = state.docsOpen ? t('hideDocs') : t('showDocs');
+      docGrid.hidden = !state.docsOpen;
+      docGrid.innerHTML = DOCS.map(d => `
+        <div class="card" data-doc-id="${d.id}">
+          <div class="card-head">
+            <span class="tile-h"><span class="badge tone-ink">${icon(PRODUCT_ICONS[d.product])}</span><h3>${esc(d.title[state.lang])}</h3></span>
+            <span class="edu-chip chip-stone">${esc(t('categories')[d.category])}</span>
+          </div>
+          <div class="card-body"><p lang="${state.lang}">${esc(d.text[state.lang])}</p></div>
+          <div class="card-foot">
+            <p class="edu-overline" style="margin-bottom: 10px;">${esc(t('vector'))}</p>
+            ${state.docVectors ? vectorBars(state.docVectors[d.id]) : `<p class="waiting">${esc(t('notIndexed'))}</p>`}
+          </div>
+        </div>`).join('');
+    }
+
+    function render() {
+      renderControls();
+      renderStages();
+      renderDocs();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // ─── Listeners ───
+    runButton.addEventListener('click', runSimulation);
+    nextButton.addEventListener('click', advance);
+    resetButton.addEventListener('click', resetSimulation);
+    queryInput.addEventListener('input', e => setQuery(e.target.value));
+    queryInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); runSimulation(); }
     });
-    
-    // Initialize the UI (documents are not indexed until step 0 or button click)
-    updateDocumentStore();
-    updateUI();
+    samplesEl.addEventListener('click', e => {
+      const btn = e.target.closest('[data-sample]');
+      if (btn) setQuery(SAMPLES[state.lang][Number(btn.dataset.sample)]);
+    });
+    langButtons.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+    embedDocsButton.addEventListener('click', () => {
+      if (state.running) return;
+      indexDocs();
+      announce('liveIndexed', { n: DOCS.length });
+      render();
+    });
+    toggleDocsButton.addEventListener('click', toggleDocs);
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.target.closest('input, textarea, select, [contenteditable]')) return;
+      const key = e.key.toLowerCase();
+      if (key === 'n' || key === 'arrowright') { e.preventDefault(); advance(); }
+      else if (key === 'r') resetSimulation();
+      else if (key === 'd') toggleDocs();
+      else if (key === 'l') setLang(state.lang === 'pl' ? 'en' : 'pl');
+    });
+
+    // ─── Init ───
+    queryInput.value = state.query;
+    applyStaticText();
+    render();
+
+    // ─── Reveal ───
+    const FONT_WAIT_MS = 1500;
+    const BRAND_FONTS = ['400 1em Outfit', '700 1em Outfit', '400 1em "IBM Plex Sans"', '600 1em "IBM Plex Sans"', '400 1em "Roboto Mono"'];
+    Promise.race([
+      Promise.all(BRAND_FONTS.map(f => document.fonts.load(f).catch(() => null))),
+      new Promise(r => setTimeout(r, FONT_WAIT_MS)),
+    ]).then(() => document.documentElement.classList.add('app-ready'));
   </script>
 </body>
 </html>
