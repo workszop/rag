@@ -326,6 +326,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     .vdb { border: 1px solid var(--line-2); border-radius: var(--r-lg); overflow: hidden; }
     .vdb-head { display: flex; align-items: center; gap: 12px; padding: 12px 18px; }
     .vdb-head h4 { margin: 0; font-family: var(--font-display); font-size: 1.15em; flex: 1; color: inherit; }
+    .vdb-head .qcode { display: flex; align-items: center; gap: 10px; }
     .vdb-head .meta { font-family: var(--font-mono); font-size: .75em; letter-spacing: .06em; text-transform: uppercase; }
     .vdb-head.tone-ink h4 { color: var(--paper); }
     .vdb-head.tone-ink .meta { color: var(--yellow); }
@@ -336,25 +337,35 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     .rec-top .ic { color: var(--ink-2); }
     .rec-title { margin: 0; font-weight: 600; font-size: .92em; line-height: 1.3; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .rec-text { margin: 0; font-size: .82em; line-height: 1.45; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-    .glyph { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: auto; }
-    .glyph-col { display: grid; justify-items: center; gap: 4px; }
-    .glyph-bar { width: 100%; max-width: 26px; height: 3.2em; background: var(--paper-3); border-radius: 5px; display: flex; align-items: flex-end; overflow: hidden; }
-    .glyph-bar i { display: block; width: 100%; background: var(--ink); border-radius: 5px 5px 0 0; }
-    .glyph-col .ic { width: 15px; height: 15px; color: var(--ink-2); }
-    .glyph-col span { font-family: var(--font-mono); font-size: .68em; color: var(--ink); }
+    .rec-body { display: grid; margin-top: auto; }
+    .rec-body > * { grid-area: 1 / 1; min-width: 0; }
+    .rec-vec { display: grid; gap: 6px; align-content: end; }
+    .rec-nums { margin: 0; font-family: var(--font-mono); font-size: .68em; line-height: 1.45; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+    .vdb.embedding .rec-text { animation: fadeOut .4s ease-in both; animation-delay: calc(var(--i, 0) * .35s + .6s); }
+    .vdb.embedding .rec-vec { animation: fadeIn .5s ease-out both; animation-delay: calc(var(--i, 0) * .35s + .9s); }
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+    @keyframes fadeIn { from { opacity: 0; } }
+
+    /* vector barcode: one bar per number, up for positive, down for negative */
+    .code { position: relative; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 2px; height: 2.6em; }
+    .code::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--line-2); }
+    .code i { position: relative; }
+    .code i::before { content: ""; position: absolute; left: 0; right: 0; bottom: 50%; height: calc(var(--h) * 50%); background: var(--ink); border-radius: 2px; }
+    .code i.neg::before { bottom: auto; top: 50%; }
+    .code-lg { height: 6em; gap: 4px; }
+    .code-q { width: 13em; height: 1.9em; flex: none; }
+    .code-q::after { background: var(--ink-3); }
+    .code-q i::before { background: var(--yellow); }
     .rec[data-hit="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink), var(--shadow-md); }
     .rec[data-hit="false"] { background: var(--paper-2); }
-    .rec[data-hit="false"] .glyph-bar i { background: var(--line-strong); }
+    .rec[data-hit="false"] .code i::before { background: var(--line-strong); }
     .rec[data-hit="false"] .rec-title { color: var(--ink-2); font-weight: 500; }
     .vdb-foot { padding: 10px 18px; border-top: 1px solid var(--line-2); font-size: .9em; color: var(--ink-2); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
     /* question vector */
-    .vec { display: grid; gap: 14px; max-width: 720px; }
-    .vec-row { display: grid; grid-template-columns: 1.6em 8em 1fr 3.5em; gap: 14px; align-items: center; font-family: var(--font-mono); font-size: 1.05em; }
-    .vec-row .ic { width: 20px; height: 20px; color: var(--ink-2); }
-    .track { height: 12px; background: var(--paper-3); border-radius: var(--r-pill); overflow: hidden; }
-    .track span { display: block; height: 100%; background: var(--ink); border-radius: var(--r-pill); }
-    .vec-row .v { text-align: right; }
+    .qvec { display: grid; gap: 14px; }
+    .num-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+    .num-grid span { font-family: var(--font-mono); font-size: .95em; text-align: center; padding: 6px 4px; background: var(--paper-2); border-radius: var(--r-xs); color: var(--ink); animation: fadeUp .3s ease-out both; animation-delay: calc(var(--i, 0) * 25ms); }
     .bubble { font-family: var(--font-display); font-weight: 600; font-size: 2em; line-height: 1.25; background: var(--paper-2); border: 1px solid var(--line-2); border-radius: var(--r-lg); padding: 18px 24px; margin: 0; overflow-wrap: anywhere; }
 
     /* prompt */
@@ -366,6 +377,36 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     /* answer stage */
     .answer-text { margin: 0; white-space: pre-wrap; font-size: 1.05em; line-height: 1.55; color: var(--ink); }
     .answer-src { display: grid; gap: 8px; }
+
+    /* ─── Flow page (how RAG works / what just happened) ─── */
+    body[data-wide="true"] .app { grid-template-columns: minmax(0, 1fr); }
+    body[data-wide="true"] .chat { display: none; }
+    .flow { --beat: 1s; flex: 1; font-size: 1.18em; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr) 2.4em) minmax(0, 1fr); grid-template-rows: auto auto minmax(2.8em, auto) auto; align-content: center; row-gap: 8px; }
+    .lane { margin: 0; align-self: end; padding-bottom: 2px; font-family: var(--font-mono); font-size: .72em; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+    .fnode { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: .8em .85em; border: 1px solid var(--line-2); border-radius: var(--r-md); background: var(--surface); box-shadow: var(--shadow-sm); font: inherit; color: var(--ink); text-align: left; }
+    button.fnode { cursor: pointer; transition: background-color .2s; }
+    button.fnode:hover { background: var(--paper-2); }
+    .fnode-h { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .fnode .badge { width: 2.1em; height: 2.1em; }
+    .fnode .badge .ic { width: 1.1em; height: 1.1em; }
+    .fnode-h strong { font-family: var(--font-display); font-weight: 700; font-size: 1em; line-height: 1.2; }
+    .fnode-d { font-size: .82em; line-height: 1.4; color: var(--ink-2); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+    .fnode-d.mono { font-family: var(--font-mono); font-size: .76em; }
+    .flink { position: relative; align-self: center; height: 2px; margin: 0 6px 0 4px; background: var(--line-strong); }
+    .flink::after { content: ""; position: absolute; right: -3px; top: -5px; border-left: 8px solid var(--line-strong); border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+    .flink i { position: absolute; top: -5px; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 2px var(--ink); opacity: 0; }
+    .vlink { justify-self: center; align-self: stretch; width: 2px; height: auto; margin: 2px 0 8px; }
+    .vlink::after { right: -5px; top: auto; bottom: -3px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid var(--line-strong); border-bottom: 0; }
+    .vlink i { left: -5px; top: 0; }
+    .flow.play .fnode { animation: fadeUp .45s ease-out both, nodeOn 1.6s ease-out both; animation-delay: calc(var(--t) * var(--beat)); }
+    .flow.play .lane { animation: fadeUp .45s ease-out both; animation-delay: calc(var(--t) * var(--beat)); }
+    .flow.play .flink { animation: fadeIn .3s ease-out both; animation-delay: calc((var(--t) - .75) * var(--beat)); }
+    .flow.play .flink i { animation: dotX calc(var(--beat) * .7) ease-in-out both; animation-delay: calc((var(--t) - .75) * var(--beat)); }
+    .flow.play .vlink i { animation-name: dotY; }
+    @keyframes nodeOn { from { box-shadow: 0 0 0 3px var(--yellow), var(--shadow-md); } }
+    @keyframes dotX { 0% { opacity: 0; left: 0; } 15%, 85% { opacity: 1; } 100% { opacity: 0; left: calc(100% - 12px); } }
+    @keyframes dotY { 0% { opacity: 0; top: 0; } 15%, 85% { opacity: 1; } 100% { opacity: 0; top: calc(100% - 12px); } }
+    .btn-sm { padding: 5px 12px; font-size: 14px; }
 
     /* ─── Documents drawer ─── */
     .drawer { margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(600px, 100vw); max-width: 100vw; border: none; border-left: 1px solid var(--line-2); padding: 0; background: var(--paper); color: var(--ink); box-shadow: var(--shadow-lg); }
@@ -401,7 +442,15 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       .prompt-grid { grid-template-columns: 1fr; }
       .bubble { font-size: 1.4em; }
       .step-btn .lbl { display: none; }
-      .vec-row { grid-template-columns: 1.4em 6em 1fr 3em; gap: 8px; }
+      .num-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .flow { display: flex; flex-direction: column; gap: 6px; }
+      .flow .flink { align-self: center; width: 2px; height: 18px; margin: 0 0 6px; }
+      .flow .flink::after { right: -5px; top: auto; bottom: -4px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid var(--line-strong); border-bottom: 0; }
+      .flow .flink i, .flow .vlink { display: none; }
+      .lane { align-self: flex-start; padding-top: 8px; }
+      .flow { font-size: 1em; }
+      .stage-head { flex-wrap: wrap; }
+      .btn-sm span { display: none; }
     }
     /* ─── Short screens (1366×768 projectors) ─── */
     @media (max-height: 820px) {
@@ -411,13 +460,17 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       .vdb-grid { gap: 8px; padding: 10px; }
       .rec { padding: 8px 10px; gap: 6px; }
       .rec-text { -webkit-line-clamp: 2; }
-      .glyph { gap: 6px; }
-      .glyph-bar { height: 2.4em; }
+      .code-lg { height: 4.5em; }
+      .num-grid span { padding: 4px; }
+      .fnode { padding: 10px; gap: 6px; }
       .vdb-head { padding: 9px 16px; }
       .vdb-foot { padding: 8px 16px; }
       .stage-body { padding: 12px 20px 14px; gap: 10px; }
     }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .vdb.embedding .rec-text { visibility: hidden; }
+    }
   </style>
 </head>
 <body class="edu" data-done="0" data-view="0" data-indexed="false" data-chat="empty">
@@ -477,46 +530,84 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
 
   <script>
     // ─── Constants ───
-    const STEP_COUNT = 6;
+    const STEP_COUNT = 8;
+    const STAGE = { intro: 0, docs: 1, ask: 2, embed: 3, search: 4, prompt: 5, answer: 6, recap: 7 };
+    const FLOW_STAGES = [STAGE.intro, STAGE.recap];   // shown as a full-width flow page
     const TOP_K = 3;
     const MIN_SIMILARITY = 0.3;
     const LANG_KEY = 'rag-sim-lang';
     const LANGS = ['pl', 'en'];
     const PRODUCT_ICONS = { laptop: 'laptop', headphones: 'headphones', smartphone: 'smartphone', tv: 'monitor' };
-    const DIM_ICONS = ['laptop', 'headphones', 'smartphone', 'monitor'];   // vector dimensions, in order
     const STAGES = [
+      { icon: 'map', tone: 'tone-ink' },
       { icon: 'database', tone: 'tone-stone' },
       { icon: 'message-circle-question', tone: 'tone-blue' },
       { icon: 'cpu', tone: 'tone-yellow' },
       { icon: 'search', tone: 'tone-green' },
       { icon: 'file-pen-line', tone: 'tone-grape' },
       { icon: 'message-square', tone: 'tone-ink' },
+      { icon: 'route', tone: 'tone-ink' },
+    ];
+    // Flow page nodes: grid cell, the beat (t) at which each one appears, the stage it opens
+    const FLOW_NODES = [
+      { key: 'docs',   icon: 'files',                   tone: 'tone-stone',  row: 2, col: 1,  t: 0, stage: STAGE.docs },
+      { key: 'embed',  icon: 'cpu',                     tone: 'tone-yellow', row: 2, col: 3,  t: 1, stage: STAGE.docs },
+      { key: 'db',     icon: 'database',                tone: 'tone-stone',  row: 2, col: 5,  t: 2, stage: STAGE.docs },
+      { key: 'ask',    icon: 'message-circle-question', tone: 'tone-blue',   row: 4, col: 1,  t: 3, stage: STAGE.ask },
+      { key: 'qembed', icon: 'cpu',                     tone: 'tone-yellow', row: 4, col: 3,  t: 4, stage: STAGE.embed },
+      { key: 'search', icon: 'search',                  tone: 'tone-green',  row: 4, col: 5,  t: 5, stage: STAGE.search },
+      { key: 'prompt', icon: 'file-pen-line',           tone: 'tone-grape',  row: 4, col: 7,  t: 6, stage: STAGE.prompt },
+      { key: 'llm',    icon: 'bot',                     tone: 'tone-ink',    row: 4, col: 9,  t: 7, stage: STAGE.answer },
+      { key: 'answer', icon: 'message-square',          tone: 'tone-ink',    row: 4, col: 11, t: 8, stage: STAGE.answer },
     ];
 
-    // Keyword patterns shared by both languages, so a Polish or English question
-    // (and the Polish or English document text) lands on the same vector.
+    // Keyword patterns shared by both languages, used by the answer templates
     const RX = {
       laptop:     /laptop|techx/,
       headphones: /headphone|soundwave|słuchawk/,
-      phone:      /\b(smart)?phones?\b|pixelplus|telefon|smartfon/,
       tv:         /\btv\b|smartview|telewizor/,
       reset:      /reset|restart|freez|frozen|zawies/,
       pair:       /\bpair|connect|bluetooth|sparow|parowa|połącz|podłącz/,
-      camera:     /camera|photo|aparat|zdję/,
-      screen:     /screen|display|audio|ekran|wyświetl|dźwięk/,
       mirror:     /mirror|cast|screen|ekran|kopiow|przesyła/,
     };
-    // Vector dimensions: laptop, headphones, phone, TV
-    const FEATURES = [
-      { rx: RX.laptop,     weights: [0.4, 0, 0, 0] },
-      { rx: RX.headphones, weights: [0, 0.4, 0, 0] },
-      { rx: RX.phone,      weights: [0, 0, 0.4, 0] },
-      { rx: RX.tv,         weights: [0, 0, 0, 0.4] },
-      { rx: RX.reset,      weights: [0.2, 0.1, 0, 0] },
-      { rx: RX.pair,       weights: [0, 0.3, 0, 0] },
-      { rx: RX.camera,     weights: [0, 0, 0.3, 0] },
-      { rx: RX.screen,     weights: [0, 0, 0, 0.2] },
+
+    // ─── Toy embedding model ───
+    // A real model learns its numbers; this one fakes the same behaviour. Hidden topics
+    // (bilingual keywords) are mixed into DIMS dense numbers by a fixed random rotation,
+    // so no single number means "laptop", yet texts about the same things get similar
+    // vectors. The rotation keeps angles, so the similarity equals the topic overlap.
+    const DIMS = 32;
+    const VEC_SCALE = 0.5;      // |value| drawn at full bar height
+    const TOPICS = [
+      { rx: RX.laptop, w: 1 },
+      { rx: RX.headphones, w: 1 },
+      { rx: /\b(smart)?phones?\b|pixelplus|telefon|smartfon/, w: 1 },
+      { rx: RX.tv, w: 1 },
+      { rx: RX.reset, w: 0.8 },
+      { rx: RX.pair, w: 0.8 },
+      { rx: /camera|photo|aparat|zdję/, w: 0.8 },
+      { rx: /display|brightness|screen|ekran|jasnoś/, w: 0.8 },
+      { rx: /sound|audio|volume|dźwięk|głośn|wycisz/, w: 0.8 },
+      { rx: /batter|bateri|charg|ładowa/, w: 0.8 },
+      { rx: /storage|memory|pamię/, w: 0.8 },
+      { rx: /mirror|\bcast|airplay|kopiow|przesyłan|wyświetl/, w: 0.8 },
     ];
+    const BASE_WEIGHT = 0.3;    // shared by every text, so nothing is a zero vector
+    const NOISE_WEIGHT = 0.12;  // word-hash wobble: different wording, slightly different numbers
+    const NOISE_DIMS = 3;
+    const ROTATION = (() => {
+      let seed = 20261015;
+      const rand = () => { seed = seed + 0x6D2B79F5 | 0; let x = Math.imul(seed ^ seed >>> 15, 1 | seed); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; };
+      const gauss = () => Math.sqrt(-2 * Math.log(rand() || 1e-9)) * Math.cos(2 * Math.PI * rand());
+      const cols = [];
+      for (let c = 0; c < TOPICS.length + 1 + NOISE_DIMS; c++) {
+        let v = Array.from({ length: DIMS }, gauss);
+        cols.forEach(u => { const d = v.reduce((s, x, i) => s + x * u[i], 0); v = v.map((x, i) => x - d * u[i]); });
+        const n = Math.hypot(...v);
+        cols.push(v.map(x => x / n));
+      }
+      return cols;
+    })();
 
     const DOCS = [
       { id: 1, product: 'laptop', category: 'troubleshooting',
@@ -588,7 +679,8 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         pageTitle: 'Symulator RAG dla wsparcia technicznego',
         appName: 'Symulator RAG',
         langSwitch: 'Język', back: 'Poprzedni krok', next: 'Dalej', restart: 'Od nowa', docs: 'Dokumenty', close: 'Zamknij',
-        backTip: 'Poprzedni krok (←)', nextTip: 'Następny krok (→)', restartTip: 'Od nowa (R)', docsTip: 'Dokumenty (D)', langTip: 'Język (L)', sendTip: 'Wyślij pytanie (Enter)', backShort: 'Wstecz', nextTo: 'Dalej: {stage}', navEnd: 'Koniec', endHint: 'Zadaj kolejne pytanie w czacie.', askHint: 'Wyślij pytanie w czacie albo naciśnij „Dalej”.',
+        backTip: 'Poprzedni krok (←)', nextTip: 'Następny krok (→)', restartTip: 'Od nowa (R)', docsTip: 'Dokumenty (D)', langTip: 'Język (L)', sendTip: 'Wyślij pytanie (Enter)', backShort: 'Wstecz', nextTo: 'Dalej: {stage}', newQuestion: 'Nowe pytanie', newQuestionTip: 'Zadaj kolejne pytanie w czacie', askHint: 'Wyślij pytanie w czacie albo naciśnij „Dalej”.',
+        replay: 'Odtwórz', replayTip: 'Odtwórz animację (P)',
         stepsNav: 'Kroki',
         chatTitle: 'Czat wsparcia TechX',
         greeting: 'Dzień dobry! Opisz problem, a znajdę odpowiedź w instrukcjach.',
@@ -599,25 +691,37 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         send: 'Wyślij',
         backLabel: 'Za kulisami',
         stepOf: 'krok {n} z {total}',
-        stageTitles: ['Osadzanie dokumentów', 'Pytanie klienta', 'Osadzanie pytania', 'Wyszukiwanie', 'Budowanie promptu', 'Odpowiedź'],
+        stageTitles: ['Jak działa RAG', 'Osadzanie dokumentów', 'Pytanie klienta', 'Osadzanie pytania', 'Wyszukiwanie', 'Budowanie promptu', 'Odpowiedź', 'Co się wydarzyło'],
         stageTalk: [
-          'Model osadzeń zamienił każdy dokument na wektor: 4 liczby mówiące, o czym jest tekst. Wektory trafiły do bazy wektorowej.',
+          'RAG to wyszukiwanie + generowanie. Zanim model językowy odpowie, system znajduje w bazie wiedzy fragmenty pasujące do pytania i daje mu je do przeczytania. Tak wygląda cała droga:',
+          'Model osadzeń zamienia każdy dokument na wektor: {d} liczb, które razem zapisują znaczenie tekstu. Wektory trafiają do bazy wektorowej.',
           'Klient wpisuje pytanie w czacie.',
-          'Ten sam model zamienia pytanie na wektor o tych samych 4 wymiarach.',
+          'Ten sam model zamienia pytanie na wektor: {d} liczb w tym samym układzie co wektory dokumentów.',
           'Baza wektorowa zwraca dokumenty o wektorach najbardziej podobnych do wektora pytania.',
           'Prompt = zasady (prompt systemowy) + znalezione dokumenty + pytanie.',
           'Model odpowiada tylko na podstawie znalezionych dokumentów i podaje linki do źródeł.',
+          'Tak przebiegło to pytanie, z danymi z tej symulacji. Kliknij etap, aby do niego wrócić.',
         ],
-        preTalk: 'Baza wiedzy to {n} instrukcji w zwykłym tekście. Naciśnij „Dalej”, a model osadzeń zamieni każdą z nich na wektor.',
+        vecNote: 'Pojedyncza liczba nic nie znaczy: żadna nie oznacza „laptopa” ani „telefonu”. Znaczenie niesie cały układ liczb, a teksty o podobnej treści dostają podobne wektory. Prawdziwe modele tworzą wektory z setek lub tysięcy liczb (np. 768 albo 1536), tu jest ich {d}.',
+        queryVec: 'Wektor pytania', quoted: '„{q}”',
+        laneIndex: 'Raz, zanim padnie pytanie',
+        laneQuery: 'Przy każdym pytaniu',
+        flowNames: { docs: 'Dokumenty', embed: 'Model osadzeń', db: 'Baza wektorowa', ask: 'Pytanie', qembed: 'Model osadzeń', search: 'Wyszukiwanie', prompt: 'Prompt', llm: 'Model językowy', answer: 'Odpowiedź' },
+        flowIntro: { docs: 'Instrukcje produktów w zwykłym tekście.', embed: 'Zamienia każdy tekst na wektor: listę liczb, która zapisuje jego znaczenie.', db: 'Przechowuje wektory wszystkich dokumentów.', ask: 'Klient pyta w czacie.', qembed: 'Ten sam model zamienia pytanie na wektor.', search: 'Szuka wektorów najbardziej podobnych do wektora pytania.', prompt: 'Zasady + znalezione dokumenty + pytanie.', llm: 'Czyta prompt i pisze odpowiedź.', answer: 'Odpowiedź z linkami do źródeł.' },
+        recapDocs: '{n} instrukcji produktów.',
+        recapEmbed: 'Każdy dokument dostał {d} liczb.',
+        recapDb: '{n} wektorów gotowych do wyszukiwania.',
+        recapNoHits: 'Nic nie przekroczyło progu {min}.',
+        recapPrompt: 'Prompt systemowy + dokumenty: {n} + pytanie.',
+        recapLlm: 'Przeczytał prompt i napisał odpowiedź z kontekstu.',
+        recapNone: 'Brak danych w bazie, więc bez zgadywania.',
         docsTitle: 'Dokumenty',
         docsMeta: '{n} tekstów',
         dbTitle: 'Baza wektorowa',
-        dbMeta: '{n} rekordów · 4 wymiary',
-        dimNames: 'Wymiary: laptop, słuchawki, telefon, TV',
+        dbMeta: '{n} rekordów · {d} liczb w wektorze',
         hitsMeta: 'Wybrane: {n} z {total} (najbardziej podobne, maks. {k}, próg {min})',
         noHits: 'Żaden dokument nie przekroczył progu {min}, więc kontekst będzie pusty.',
         emptyQuery: '(puste pytanie)',
-        zeroVector: 'Wektor pytania jest pusty: pytanie nie dotyczy żadnego z 4 tematów.',
         roleSystem: 'Prompt systemowy', roleUser: 'Wiadomość użytkownika',
         promptContext: 'KONTEKST', promptQuestion: 'PYTANIE',
         promptNoContext: '(brak dokumentów powyżej progu podobieństwa)',
@@ -634,6 +738,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         liveMatched: 'Znalezione dokumenty: {n}.',
         livePrompt: 'Prompt zbudowany.',
         liveAnswered: 'Odpowiedź wysłana do klienta.',
+        liveRecap: 'Podsumowanie: schemat całej drogi pytania.',
         liveReset: 'Symulacja od nowa.',
         systemPrompt: 'Jesteś asystentem wsparcia technicznego produktów TechX, SoundWave, PixelPlus i SmartView.\n\nZasady:\n1. Odpowiadaj wyłącznie na podstawie dokumentów z sekcji KONTEKST.\n2. Jeśli kontekst nie zawiera odpowiedzi, napisz, że nie masz takich informacji. Nie zgaduj i nie korzystaj z wiedzy spoza kontekstu.\n3. Tam, gdzie to możliwe, podawaj instrukcje krok po kroku.\n4. Wskaż dokumenty, z których korzystasz, np. [Dok. 1].\n5. Odpowiadaj w języku użytkownika.',
         laptopFreeze: 'Jeśli laptop TechX Pro 13 zawiesił się lub nie reaguje:\n\n1. Przytrzymaj przycisk zasilania przez 10 sekund, aby wymusić wyłączenie.\n2. Odczekaj co najmniej 30 sekund przed ponownym włączeniem.\n3. Jeśli to nie pomoże, zresetuj SMC: przytrzymaj jednocześnie Shift+Control+Option i przycisk zasilania przez 10 sekund.\n\nJeśli problem wraca, może to oznaczać usterkę sprzętu wymagającą serwisu.',
@@ -641,13 +746,13 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         tvMirror: 'Aby wyświetlić ekran na telewizorze SmartView 4K:\n\n1. Upewnij się, że urządzenie i telewizor są w tej samej sieci Wi-Fi.\n2. Otwórz funkcję kopiowania ekranu (AirPlay w urządzeniach Apple, SmartView w Androidzie).\n3. Wybierz telewizor z listy dostępnych urządzeń.\n4. Na komputerze z Windows naciśnij Windows+K, aby otworzyć menu przesyłania.\n\nJeśli pojawią się problemy z połączeniem, uruchom ponownie urządzenie i telewizor.',
         none: 'W bazie wiedzy nie ma dokumentów pasujących do tego pytania, więc system nie odpowie. Lepiej przyznać się do braku danych niż zgadywać.',
         combineIntro: 'Na podstawie dostępnych informacji:',
-        dims: ['laptop', 'słuchawki', 'telefon', 'TV'],
       },
       en: {
         pageTitle: 'Tech Support RAG System Simulator',
         appName: 'RAG simulator',
         langSwitch: 'Language', back: 'Previous step', next: 'Next', restart: 'Start over', docs: 'Documents', close: 'Close',
-        backTip: 'Previous step (←)', nextTip: 'Next step (→)', restartTip: 'Start over (R)', docsTip: 'Documents (D)', langTip: 'Language (L)', sendTip: 'Send the question (Enter)', backShort: 'Back', nextTo: 'Next: {stage}', navEnd: 'Done', endHint: 'Ask another question in the chat.', askHint: 'Send the question in the chat or press “Next”.',
+        backTip: 'Previous step (←)', nextTip: 'Next step (→)', restartTip: 'Start over (R)', docsTip: 'Documents (D)', langTip: 'Language (L)', sendTip: 'Send the question (Enter)', backShort: 'Back', nextTo: 'Next: {stage}', newQuestion: 'New question', newQuestionTip: 'Ask another question in the chat', askHint: 'Send the question in the chat or press “Next”.',
+        replay: 'Replay', replayTip: 'Replay the animation (P)',
         stepsNav: 'Steps',
         chatTitle: 'TechX support chat',
         greeting: 'Hi! Describe the problem and I will find the answer in our manuals.',
@@ -658,25 +763,37 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         send: 'Send',
         backLabel: 'Behind the scenes',
         stepOf: 'step {n} of {total}',
-        stageTitles: ['Embedding documents', 'Customer question', 'Embedding the question', 'Retrieval', 'Prompt building', 'Answer'],
+        stageTitles: ['How RAG works', 'Embedding documents', 'Customer question', 'Embedding the question', 'Retrieval', 'Prompt building', 'Answer', 'What just happened'],
         stageTalk: [
-          'The embedding model turned every document into a vector: 4 numbers saying what the text is about. The vectors went into a vector database.',
+          'RAG is retrieval + generation. Before the language model answers, the system finds the parts of the knowledge base that match the question and hands them to the model to read. This is the whole path:',
+          'The embedding model turns every document into a vector: {d} numbers that together capture what the text means. The vectors go into a vector database.',
           'The customer types a question in the chat.',
-          'The same model turns the question into a vector with the same 4 dimensions.',
+          'The same model turns the question into a vector: {d} numbers laid out the same way as the document vectors.',
           'The vector database returns the documents whose vectors are most similar to the question vector.',
           'Prompt = rules (system prompt) + retrieved documents + question.',
           'The model answers from the retrieved documents only and links to its sources.',
+          'This is how the question travelled, with the data from this run. Click a stage to go back to it.',
         ],
-        preTalk: 'The knowledge base is {n} manuals in plain text. Press “Next” and the embedding model turns each of them into a vector.',
+        vecNote: 'A single number means nothing on its own: none of them stands for “laptop” or “phone”. The meaning lives in the whole pattern, and texts with similar content get similar vectors. Real models produce hundreds or thousands of numbers (e.g. 768 or 1536); here there are {d}.',
+        queryVec: 'Question vector', quoted: '“{q}”',
+        laneIndex: 'Once, before any question',
+        laneQuery: 'For every question',
+        flowNames: { docs: 'Documents', embed: 'Embedding model', db: 'Vector database', ask: 'Question', qembed: 'Embedding model', search: 'Retrieval', prompt: 'Prompt', llm: 'Language model', answer: 'Answer' },
+        flowIntro: { docs: 'Product manuals in plain text.', embed: 'Turns each text into a vector: a list of numbers that captures its meaning.', db: 'Stores the vectors of all documents.', ask: 'The customer asks in the chat.', qembed: 'The same model turns the question into a vector.', search: 'Finds the vectors most similar to the question vector.', prompt: 'Rules + retrieved documents + question.', llm: 'Reads the prompt and writes the answer.', answer: 'An answer with links to its sources.' },
+        recapDocs: '{n} product manuals.',
+        recapEmbed: 'Each document got {d} numbers.',
+        recapDb: '{n} vectors ready for search.',
+        recapNoHits: 'Nothing passed the {min} threshold.',
+        recapPrompt: 'System prompt + documents: {n} + question.',
+        recapLlm: 'Read the prompt and wrote the answer from the context.',
+        recapNone: 'No data in the knowledge base, so no guessing.',
         docsTitle: 'Documents',
         docsMeta: '{n} texts',
         dbTitle: 'Vector database',
-        dbMeta: '{n} records · 4 dimensions',
-        dimNames: 'Dimensions: laptop, headphones, phone, TV',
+        dbMeta: '{n} records · {d} numbers per vector',
         hitsMeta: 'Selected: {n} of {total} (most similar, up to {k}, threshold {min})',
         noHits: 'No document passed the {min} threshold, so the context will be empty.',
         emptyQuery: '(empty question)',
-        zeroVector: 'The question vector is empty: the question is about none of the 4 topics.',
         roleSystem: 'System prompt', roleUser: 'User message',
         promptContext: 'CONTEXT', promptQuestion: 'QUESTION',
         promptNoContext: '(no documents above the similarity threshold)',
@@ -693,6 +810,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         liveMatched: 'Documents retrieved: {n}.',
         livePrompt: 'Prompt built.',
         liveAnswered: 'Answer sent to the customer.',
+        liveRecap: 'Recap: the whole path of the question.',
         liveReset: 'Simulation restarted.',
         systemPrompt: "You are a technical support assistant for TechX, SoundWave, PixelPlus and SmartView products.\n\nRules:\n1. Answer only from the documents in the CONTEXT section.\n2. If the context does not contain the answer, say you have no information about it. Do not guess and do not use knowledge from outside the context.\n3. Give step-by-step instructions where possible.\n4. Name the documents you used, e.g. [Doc 1].\n5. Reply in the user's language.",
         laptopFreeze: "If your TechX Pro 13 laptop is frozen or unresponsive, you should:\n\n1. Press and hold the power button for 10 seconds to force a shutdown\n2. Wait at least 30 seconds before turning it back on\n3. If this doesn't resolve the issue, try resetting the SMC by holding Shift+Control+Option and the power button simultaneously for 10 seconds\n\nIf the problem persists, it might indicate a more serious hardware issue requiring service.",
@@ -700,7 +818,6 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         tvMirror: "To mirror your screen to a SmartView 4K TV:\n\n1. Make sure both your device and TV are connected to the same WiFi network\n2. On your device, open the screen mirroring function (AirPlay on Apple, SmartView on Android)\n3. Select your TV from the list of available devices\n4. For Windows PC, press Windows+K to open the casting menu\n\nIf you're having connection issues, try restarting both your device and TV.",
         none: 'The knowledge base has no documents that match this question, so the system will not answer it. Admitting missing data beats guessing.',
         combineIntro: 'Based on the information I have:',
-        dims: ['laptop', 'headphones', 'phone', 'TV'],
       },
     };
 
@@ -708,7 +825,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     const savedLang = localStorage.getItem(LANG_KEY);
     const state = {
       lang: LANGS.includes(savedLang) ? savedLang : 'pl',
-      done: 0,             // completed stages, 0..STEP_COUNT
+      done: 1,             // stages reached, 1..STEP_COUNT (the intro is always reached)
       view: 0,             // stage shown behind the scenes
       query: '',
       docVectors: null,    // { [docId]: number[] } once embedded
@@ -717,6 +834,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       retrieved: [],       // docs above MIN_SIMILARITY, top K
       answer: null,        // { kind: 'none' } | { kind: 'template', id, docIds } | { kind: 'combine', docIds }
       focusDoc: null,      // doc highlighted in the drawer
+      animateEmbed: false, // play the text-to-vector animation on the next render of the docs stage
     };
     state.query = SAMPLES[state.lang][0];
     let stageKey = '';     // re-render the stage card only when this changes
@@ -753,24 +871,35 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     }
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const icon = (name, cls = 'ic') => `<i data-lucide="${name}" class="${cls}" aria-hidden="true"></i>`;
-    const fmt2 = v => v.toFixed(2);
+    const fmt2 = v => (Math.abs(v) < 0.005 ? 0 : v).toFixed(2);
     const docById = id => DOCS.find(d => d.id === id);
     const stageTitle = i => t('stageTitles')[i];
     const scoreOf = id => state.scores.find(s => s.id === id);
 
-    function embed(text) {
-      const lower = text.toLowerCase();
-      const v = [0, 0, 0, 0];
-      FEATURES.forEach(f => { if (f.rx.test(lower)) f.weights.forEach((w, i) => { v[i] += w; }); });
-      const sum = v.reduce((a, b) => a + b, 0);
-      return sum ? v.map(x => x / sum) : v;
+    // Topic weights of a text: the hidden "meaning" the toy model works from
+    const topicsOf = text => { const lower = text.toLowerCase(); return TOPICS.map(f => (f.rx.test(lower) ? f.w : 0)); };
+
+    function wordNoise(text) {
+      const out = new Array(NOISE_DIMS).fill(0);
+      (text.toLowerCase().match(/\p{L}+/gu) || []).forEach(word => {
+        let h = 2166136261;
+        for (const ch of word) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); }
+        out[(h >>> 0) % NOISE_DIMS] += (h >>> 8) & 1 ? 1 : -1;
+      });
+      const n = Math.hypot(...out);
+      return n ? out.map(x => x / n * NOISE_WEIGHT) : out;
     }
 
-    function cosine(a, b) {
-      let dot = 0, ma = 0, mb = 0;
-      for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; ma += a[i] * a[i]; mb += b[i] * b[i]; }
-      return ma && mb ? dot / (Math.sqrt(ma) * Math.sqrt(mb)) : 0;
+    function embed(text) {
+      const hidden = [...topicsOf(text), BASE_WEIGHT, ...wordNoise(text)];
+      const v = new Array(DIMS).fill(0);
+      hidden.forEach((x, c) => { if (x) for (let i = 0; i < DIMS; i++) v[i] += x * ROTATION[c][i]; });
+      const n = Math.hypot(...v);
+      return v.map(x => x / n);
     }
+
+    // Vectors are unit length, so the dot product is the cosine similarity
+    const cosine = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0);
 
     function embedDocs() {
       // Embed the English source text; the Polish translation maps to the same vector.
@@ -811,36 +940,39 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       state.answer = null;
     }
 
-    const lastView = () => Math.max(0, state.done - 1);
+    const lastView = () => state.done - 1;
 
     // The question changed: drop everything computed from the old one, keep the embedded docs
     function invalidateQuery() {
       clearQueryResults();
-      if (state.done > 1) state.done = 1;
+      if (state.done > STAGE.ask) state.done = STAGE.ask;
       if (state.view > lastView()) state.view = lastView();
     }
 
     function announce(key, vars) { liveEl.textContent = t(key, vars); }
 
-    const STEP_ACTIONS = [
-      () => { embedDocs(); announce('liveEmbedded', { n: DOCS.length }); },
+    // Runs when a stage is reached for the first time
+    const STAGE_ACTIONS = [
+      () => {},
+      () => { embedDocs(); state.animateEmbed = true; announce('liveEmbedded', { n: DOCS.length }); },
       () => announce('liveAsked'),
       () => { state.queryVector = embed(state.query); announce('liveQueryEmbedded'); },
       () => { retrieveDocs(); announce('liveMatched', { n: state.retrieved.length }); },
       () => announce('livePrompt'),
       () => { state.answer = generateAnswer(); announce('liveAnswered'); },
+      () => announce('liveRecap'),
     ];
 
-    function completeNextStage() {
-      STEP_ACTIONS[state.done]();
+    function reachNextStage() {
+      STAGE_ACTIONS[state.done]();
       state.done++;
       state.view = state.done - 1;
     }
 
-    // → : show the next finished stage, or run the next one
+    // → : show the next reached stage, or reach the next one
     function forward() {
-      if (state.view < state.done - 1) state.view++;
-      else if (state.done < STEP_COUNT) completeNextStage();
+      if (state.view < lastView()) state.view++;
+      else if (state.done < STEP_COUNT) reachNextStage();
       else return;
       render();
     }
@@ -860,15 +992,30 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     // Send in the chat: the question goes out (documents get embedded first if needed), one step at a time after that
     function sendQuestion() {
       if (!state.query.trim()) { queryInput.focus(); return; }
-      if (state.done >= 2) { goTo(1); return; }
-      while (state.done < 2) completeNextStage();
+      if (state.done > STAGE.ask) { goTo(STAGE.ask); return; }
+      while (state.done <= STAGE.ask) reachNextStage();
       render();
+    }
+
+    // End of the run: back to the ready vector database with the chat input focused
+    function newQuestion() {
+      goTo(STAGE.docs);
+      queryInput.focus();
+      queryInput.select();
+    }
+
+    function replayFlow() {
+      const flow = $('flow');
+      if (!flow) return;
+      flow.classList.remove('play');
+      void flow.offsetWidth;   // restart the CSS animations
+      flow.classList.add('play');
     }
 
     function resetSimulation() {
       clearQueryResults();
       state.docVectors = null;
-      state.done = 0;
+      state.done = 1;
       state.view = 0;
       announce('liveReset');
       render();
@@ -906,9 +1053,11 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     }
 
     // ─── Render: pieces ───
-    function glyph(v) {
-      return `<div class="glyph" title="${esc(t('dimNames'))}">${v.map((x, i) => `<span class="glyph-col"><span class="glyph-bar"><i style="height:${(x * 100).toFixed(0)}%"></i></span>${icon(DIM_ICONS[i])}<span>${fmt2(x)}</span></span>`).join('')}</div>`;
+    // A vector drawn as a barcode: one bar per number, up for positive, down for negative
+    function barcode(v, cls = '') {
+      return `<div class="code ${cls}" style="--n:${v.length}" aria-hidden="true">${v.map(x => `<i${x < 0 ? ' class="neg"' : ''} style="--h:${Math.min(1, Math.abs(x) / VEC_SCALE).toFixed(2)}"></i>`).join('')}</div>`;
     }
+    const numbers = (v, n = v.length) => v.slice(0, n).map(fmt2).join(', ') + (n < v.length ? ', …' : '');
 
     function docLink(id) {
       const d = docById(id);
@@ -920,14 +1069,14 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       return [t('combineIntro'), ...a.docIds.map(id => `${t('docShort')} ${id} – ${docById(id).title[state.lang]}:\n${docById(id).text[state.lang]}`)].join('\n\n');
     }
 
-    // Documents as text (before embedding) or as vector database records
-    function vectorDb({ highlight }) {
-      const embedded = !!state.docVectors;
+    // Documents as vector database records; animate = text dissolving into its vector
+    function vectorDb({ highlight, animate = false }) {
       const rank = Object.fromEntries(state.retrieved.map((r, i) => [r.id, i + 1]));
-      const head = embedded
-        ? `<div class="vdb-head tone-ink">${icon('database')}<h4>${esc(t('dbTitle'))}</h4><span class="meta">${esc(t('dbMeta', { n: DOCS.length }))}</span></div>`
-        : `<div class="vdb-head tone-stone">${icon('files')}<h4>${esc(t('docsTitle'))}</h4><span class="meta">${esc(t('docsMeta', { n: DOCS.length }))}</span></div>`;
+      const head = highlight
+        ? `<div class="vdb-head tone-ink">${icon('database')}<h4>${esc(t('dbTitle'))}</h4><span class="qcode"><span class="meta">${esc(t('queryVec'))}</span>${barcode(state.queryVector, 'code-q')}</span></div>`
+        : `<div class="vdb-head tone-ink">${icon('database')}<h4>${esc(t('dbTitle'))}</h4><span class="meta">${esc(t('dbMeta', { n: DOCS.length, d: DIMS }))}</span></div>`;
       const recs = DOCS.map((d, i) => {
+        const vec = state.docVectors[d.id];
         const hit = highlight ? `data-hit="${!!rank[d.id]}"` : '';
         const chip = highlight && rank[d.id]
           ? `<span class="edu-chip chip-green">#${rank[d.id]} · ${fmt2(scoreOf(d.id).similarity)}</span>`
@@ -935,7 +1084,10 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         return `<div class="rec" style="--i:${i}" data-doc-id="${d.id}" ${hit}>
           <div class="rec-top">${chip}${icon(PRODUCT_ICONS[d.product])}</div>
           <p class="rec-title">${esc(d.title[state.lang])}</p>
-          ${embedded ? glyph(state.docVectors[d.id]) : `<p class="rec-text">${esc(d.text[state.lang])}</p>`}
+          <div class="rec-body">
+            ${animate ? `<p class="rec-text">${esc(d.text[state.lang])}</p>` : ''}
+            <div class="rec-vec" title="${esc(t('vector'))}: [${numbers(vec)}]">${barcode(vec)}<p class="rec-nums">[${numbers(vec, 8)}]</p></div>
+          </div>
         </div>`;
       }).join('');
       const foot = highlight
@@ -943,19 +1095,54 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
             ? `${icon('circle-check')}<span>${esc(t('hitsMeta', { n: state.retrieved.length, total: DOCS.length, k: TOP_K, min: fmt2(MIN_SIMILARITY) }))}</span>`
             : `${icon('info')}<span>${esc(t('noHits', { min: fmt2(MIN_SIMILARITY) }))}</span>`}</div>`
         : '';
-      return `<div class="vdb" data-embedded="${embedded}">${head}<div class="vdb-grid reveal">${recs}</div>${foot}</div>`;
+      return `<div class="vdb${animate ? ' embedding' : ''}" data-embedded="true">${head}<div class="vdb-grid${animate ? '' : ' reveal'}">${recs}</div>${foot}</div>`;
+    }
+
+    // Flow page: generic on the intro, filled with this run's data on the recap
+    function flowDetail(key, recap) {
+      if (!recap) return esc(t('flowIntro')[key]);
+      const a = state.answer;
+      switch (key) {
+        case 'docs': return esc(t('recapDocs', { n: DOCS.length }));
+        case 'embed': return esc(t('recapEmbed', { d: DIMS }));
+        case 'db': return esc(t('recapDb', { n: DOCS.length }));
+        case 'ask': return esc(t('quoted', { q: state.query.trim() || t('emptyQuery') }));
+        case 'qembed': return `[${esc(numbers(state.queryVector, 3))}]`;
+        case 'search': return state.retrieved.length
+          ? state.retrieved.map(r => `${esc(t('docShort'))} ${r.id} · ${fmt2(r.similarity)}`).join('<br>')
+          : esc(t('recapNoHits', { min: fmt2(MIN_SIMILARITY) }));
+        case 'prompt': return esc(t('recapPrompt', { n: state.retrieved.length }));
+        case 'llm': return esc(t('recapLlm'));
+        case 'answer': return a.kind === 'none'
+          ? esc(t('recapNone'))
+          : `${esc(answerText(a).split('\n')[0].replace(/:$/, '…'))}<br>${esc(t('sourcesTitle'))}: ${a.docIds.map(id => `${esc(t('docShort'))} ${id}`).join(', ')}`;
+      }
+      return '';
+    }
+
+    function flowDiagram(recap) {
+      const parts = [`<p class="lane" style="grid-area:1 / 1 / 2 / 6; --t:0">${esc(t('laneIndex'))}</p>`];
+      FLOW_NODES.forEach((n, i) => {
+        if (n.key === 'ask') parts.push(
+          `<span class="flink vlink" style="grid-area:3 / 5; --t:${FLOW_NODES.find(x => x.key === 'search').t}" aria-hidden="true"><i></i></span>`,
+          `<p class="lane" style="grid-area:3 / 1 / 4 / 4; --t:${n.t}">${esc(t('laneQuery'))}</p>`);
+        else if (i) parts.push(`<span class="flink" style="grid-area:${n.row} / ${n.col - 1}; --t:${n.t}" aria-hidden="true"><i></i></span>`);
+        const inner = `<span class="fnode-h"><span class="badge ${n.tone}">${icon(n.icon)}</span><strong>${esc(t('flowNames')[n.key])}</strong></span><span class="fnode-d${recap && n.key === 'qembed' ? ' mono' : ''}">${flowDetail(n.key, recap)}</span>`;
+        const attrs = `class="fnode" style="grid-area:${n.row} / ${n.col}; --t:${n.t}" data-node="${n.key}"`;
+        parts.push(recap
+          ? `<button type="button" ${attrs} data-goto="${n.stage}">${inner}</button>`
+          : `<div ${attrs}>${inner}</div>`);
+      });
+      return `<div class="flow play" id="flow" data-flow="${recap ? 'recap' : 'intro'}">${parts.join('')}</div>`;
     }
 
     // ─── Render: stage bodies ───
     const STAGE_BODY = [
-      () => vectorDb({ highlight: false }),
+      () => flowDiagram(false),
+      animate => vectorDb({ highlight: false, animate }),
       () => `<p class="bubble"></p>`,
-      () => {
-        const v = state.queryVector;
-        const zero = !v.some(x => x > 0);
-        return `<div class="vec reveal">${v.map((x, i) => `<div class="vec-row" style="--i:${i}">${icon(DIM_ICONS[i])}<span>${esc(t('dims')[i])}</span><span class="track"><span style="width:${(x * 100).toFixed(1)}%"></span></span><span class="v">${fmt2(x)}</span></div>`).join('')}</div>
-          ${zero ? `<div class="callout tone-blue edu-block">${icon('info')}<p>${esc(t('zeroVector'))}</p></div>` : ''}`;
-      },
+      () => `<div class="qvec reveal">${barcode(state.queryVector, 'code-lg')}<div class="num-grid" title="${esc(t('queryVec'))}">${state.queryVector.map((x, i) => `<span style="--i:${i}">${fmt2(x)}</span>`).join('')}</div></div>
+          <div class="callout tone-blue edu-block">${icon('info')}<p>${esc(t('vecNote', { d: DIMS }))}</p></div>`,
       () => vectorDb({ highlight: true }),
       () => `<div class="prompt-grid" data-prompt-docs="${state.retrieved.map(r => r.id).join(',')}">
           <div class="msg" data-role="system"><div class="msg-head"><span class="over-mono">${esc(t('roleSystem'))}</span></div><p class="msg-text" id="systemPromptText"></p></div>
@@ -967,13 +1154,14 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         return `<p class="answer-text" id="answerStageText"></p>
           <div class="answer-src"><p class="over-mono">${esc(t('sourcesTitle'))}</p>${a.docIds.map(docLink).join('')}</div>`;
       },
+      () => flowDiagram(true),
     ];
 
     // Text that comes from user input or long strings goes in with textContent
     function fillStageText(i) {
-      if (i === 1) stageCard.querySelector('.bubble').textContent = state.query.trim() || t('emptyQuery');
-      if (i === 4) { $('systemPromptText').textContent = t('systemPrompt'); $('userPromptText').textContent = buildUserPrompt(); }
-      if (i === 5 && state.answer.kind !== 'none') $('answerStageText').textContent = answerText(state.answer);
+      if (i === STAGE.ask) stageCard.querySelector('.bubble').textContent = state.query.trim() || t('emptyQuery');
+      if (i === STAGE.prompt) { $('systemPromptText').textContent = t('systemPrompt'); $('userPromptText').textContent = buildUserPrompt(); }
+      if (i === STAGE.answer && state.answer.kind !== 'none') $('answerStageText').textContent = answerText(state.answer);
     }
 
     // ─── Render ───
@@ -992,16 +1180,18 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       const b = document.body.dataset;
       b.done = state.done; b.view = state.view; b.lang = state.lang;
       b.indexed = !!state.docVectors;
+      b.wide = FLOW_STAGES.includes(state.view);
       langButtons.forEach(btn => {
         const on = btn.dataset.lang === state.lang;
         btn.classList.toggle('active', on);
         btn.setAttribute('aria-pressed', on);
       });
-      const atEnd = state.done === STEP_COUNT && state.view === STEP_COUNT - 1;
+      const atEnd = state.view === STEP_COUNT - 1;
       backButton.disabled = state.view <= 0;
-      nextButton.disabled = atEnd;
-      nextLabel.textContent = atEnd ? t('navEnd') : t('nextTo', { stage: stageTitle(state.view + 1) });
-      navHint.textContent = atEnd ? t('endHint') : state.done === 1 && state.view === 0 ? t('askHint') : '';
+      nextLabel.textContent = atEnd ? t('newQuestion') : t('nextTo', { stage: stageTitle(state.view + 1) });
+      nextButton.title = atEnd ? t('newQuestionTip') : t('nextTip');
+      nextButton.dataset.action = atEnd ? 'new-question' : 'next';
+      navHint.textContent = state.done === STAGE.ask && state.view === STAGE.docs ? t('askHint') : '';
       samplesEl.innerHTML = SAMPLES[state.lang].map((q, i) =>
         `<button type="button" class="sample" data-sample="${i}" aria-pressed="${q === state.query}">${esc(q)}</button>`
       ).join('');
@@ -1011,8 +1201,8 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     }
 
     function renderChat() {
-      const asked = state.done >= 2;
-      const answered = state.done >= STEP_COUNT;
+      const asked = state.done > STAGE.ask;
+      const answered = state.done > STAGE.answer;
       document.body.dataset.chat = answered ? 'answered' : asked ? 'typing' : 'empty';
       const key = [asked, answered, state.lang, state.query].join('|');
       if (key === chatKey) return;
@@ -1048,10 +1238,14 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       if (key === stageKey) return;
       stageKey = key;
       const v = state.view;
-      const talk = v === 0 && !state.docVectors ? t('preTalk', { n: DOCS.length }) : t('stageTalk')[v];
+      const animate = state.animateEmbed && v === STAGE.docs;
+      state.animateEmbed = false;
+      const replay = FLOW_STAGES.includes(v)
+        ? `<button type="button" class="btn-ghost btn-sm" data-replay title="${esc(t('replayTip'))}">${icon('play')}<span>${esc(t('replay'))}</span></button>`
+        : '';
       stageCard.dataset.stage = v;
-      stageCard.innerHTML = `<div class="stage-head"><span class="tile-h"><span class="badge ${STAGES[v].tone}">${icon(STAGES[v].icon)}</span><h3>${esc(stageTitle(v))}</h3></span><span class="edu-chip chip-yellow">${esc(t('stepOf', { n: v + 1, total: STEP_COUNT }))}</span></div>
-        <div class="stage-body"><p class="talk">${esc(talk)}</p>${STAGE_BODY[v]()}</div>`;
+      stageCard.innerHTML = `<div class="stage-head"><span class="tile-h"><span class="badge ${STAGES[v].tone}">${icon(STAGES[v].icon)}</span><h3>${esc(stageTitle(v))}</h3></span><span class="tile-h">${replay}<span class="edu-chip chip-yellow">${esc(t('stepOf', { n: v + 1, total: STEP_COUNT }))}</span></span></div>
+        <div class="stage-body"><p class="talk">${esc(t('stageTalk')[v].replaceAll('{d}', DIMS))}</p>${STAGE_BODY[v](animate)}</div>`;
       fillStageText(v);
     }
 
@@ -1086,17 +1280,18 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       const btn = e.target.closest('[data-sample]');
       if (btn) setQuery(SAMPLES[state.lang][Number(btn.dataset.sample)]);
     });
-    nextButton.addEventListener('click', forward);
+    nextButton.addEventListener('click', () => (state.view === STEP_COUNT - 1 ? newQuestion() : forward()));
     backButton.addEventListener('click', backward);
     resetButton.addEventListener('click', resetSimulation);
     docsButton.addEventListener('click', () => openDocs());
     drawerClose.addEventListener('click', () => drawer.close());
     drawer.addEventListener('click', e => { if (e.target === drawer) drawer.close(); });
     drawer.addEventListener('close', () => { state.focusDoc = null; });
-    stepperEl.addEventListener('click', e => {
+    [stepperEl, stageCard].forEach(el => el.addEventListener('click', e => {
+      if (e.target.closest('[data-replay]')) { replayFlow(); return; }
       const btn = e.target.closest('[data-goto]');
       if (btn && !btn.disabled) goTo(Number(btn.dataset.goto));
-    });
+    }));
     document.addEventListener('click', e => {
       const link = e.target.closest('[data-doc-link]');
       if (!link) return;
@@ -1113,6 +1308,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       else if (key === 'r') resetSimulation();
       else if (key === 'd') drawer.open ? drawer.close() : openDocs();
       else if (key === 'l') setLang(state.lang === 'pl' ? 'en' : 'pl');
+      else if (key === 'p') replayFlow();
     });
 
     // ─── Init ───
