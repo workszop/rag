@@ -408,6 +408,17 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     @keyframes dotY { 0% { opacity: 0; top: 0; } 15%, 85% { opacity: 1; } 100% { opacity: 0; top: calc(100% - 12px); } }
     .btn-sm { padding: 5px 12px; font-size: 14px; }
 
+    /* map dialog: the flow with the current stage marked */
+    .fnode[data-state="todo"] { background: var(--paper-2); border-style: dashed; box-shadow: none; }
+    .fnode[data-state="todo"] .fnode-h strong { color: var(--ink-2); font-weight: 600; }
+    .fnode[data-current="true"] { border-color: var(--ink); box-shadow: 0 0 0 3px var(--yellow), var(--shadow-md); }
+    .fnode .here { align-self: flex-start; }
+    .map-dialog { width: min(1500px, 96vw); max-width: 96vw; max-height: 94dvh; border: 1px solid var(--line-2); border-radius: var(--r-lg); padding: 0; background: var(--paper); color: var(--ink); box-shadow: var(--shadow-lg); overflow: hidden; }
+    .map-dialog[open] { display: flex; flex-direction: column; animation: fadeUp .25s ease-out; }
+    .map-dialog::backdrop { background: color-mix(in srgb, var(--ink) 35%, transparent); }
+    .map-body { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 24px 26px; display: flex; flex-direction: column; gap: 14px; font-size: clamp(14px, 1vw, 20px); }
+    .map-body .talk { font-size: 1em; }
+
     /* ─── Documents drawer ─── */
     .drawer { margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(600px, 100vw); max-width: 100vw; border: none; border-left: 1px solid var(--line-2); padding: 0; background: var(--paper); color: var(--ink); box-shadow: var(--shadow-lg); }
     .drawer[open] { display: flex; flex-direction: column; animation: slideIn .25s ease-out; }
@@ -450,7 +461,11 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       .lane { align-self: flex-start; padding-top: 8px; }
       .flow { font-size: 1em; }
       .stage-head { flex-wrap: wrap; }
-      .btn-sm span { display: none; }
+      .btn-sm span, #mapButton span { display: none; }
+      #mapButton { padding: 9px 11px; }
+      .map-dialog .drawer-head { flex-wrap: wrap; }
+      #mapHere { order: 5; white-space: normal; }
+      .map-body { padding: 14px; }
     }
     /* ─── Short screens (1366×768 projectors) ─── */
     @media (max-height: 820px) {
@@ -479,6 +494,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     <span class="edu-wordmark">edulab</span>
     <span class="app-name" data-i18n="appName"></span>
     <div class="hdr-ctrl">
+      <button id="mapButton" type="button" class="btn-ghost" aria-haspopup="dialog" data-i18n-title="mapTip"><i data-lucide="route" class="ic" aria-hidden="true"></i><span data-i18n="mapShort"></span></button>
       <button id="resetButton" type="button" class="btn-ghost icon-only" data-i18n-aria="restart" data-i18n-title="restartTip"><i data-lucide="rotate-ccw" class="ic" aria-hidden="true"></i></button>
       <button id="docsButton" type="button" class="btn-ghost icon-only" aria-haspopup="dialog" data-i18n-aria="docs" data-i18n-title="docsTip"><i data-lucide="library" class="ic" aria-hidden="true"></i></button>
       <div class="edu-seg" role="group" data-i18n-aria="langSwitch" data-i18n-title="langTip">
@@ -518,6 +534,16 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
   </main>
   <div class="s-prog" role="progressbar" id="progressBar" aria-valuemin="0"><span id="progressFill"></span></div>
   <p class="sr-only" aria-live="polite" id="live"></p>
+
+  <dialog class="map-dialog" id="mapDialog" aria-labelledby="mapTitle">
+    <div class="drawer-head">
+      <span class="badge tone-ink"><i data-lucide="route" class="ic" aria-hidden="true"></i></span>
+      <h2 id="mapTitle" data-i18n="mapTitle"></h2>
+      <span class="edu-chip chip-yellow" id="mapHere"></span>
+      <button type="button" class="btn-ghost icon-only" id="mapClose" data-i18n-aria="close"><i data-lucide="x" class="ic" aria-hidden="true"></i></button>
+    </div>
+    <div class="map-body" id="mapBody"></div>
+  </dialog>
 
   <dialog class="drawer" id="drawer" aria-labelledby="drawerTitle">
     <div class="drawer-head">
@@ -681,6 +707,8 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         langSwitch: 'Język', back: 'Poprzedni krok', next: 'Dalej', restart: 'Od nowa', docs: 'Dokumenty', close: 'Zamknij',
         backTip: 'Poprzedni krok (←)', nextTip: 'Następny krok (→)', restartTip: 'Od nowa (R)', docsTip: 'Dokumenty (D)', langTip: 'Język (L)', sendTip: 'Wyślij pytanie (Enter)', backShort: 'Wstecz', nextTo: 'Dalej: {stage}', newQuestion: 'Nowe pytanie', newQuestionTip: 'Zadaj kolejne pytanie w czacie', askHint: 'Wyślij pytanie w czacie albo naciśnij „Dalej”.',
         replay: 'Odtwórz', replayTip: 'Odtwórz animację (P)',
+        mapShort: 'Schemat', mapTip: 'Schemat RAG: gdzie jesteś (M)', mapTitle: 'Schemat RAG', youAreHere: 'Tu jesteś', hereStage: 'Tu jesteś: {stage}',
+        mapHint: 'Zaznaczony etap to krok, na którym jesteś. Kliknij osiągnięty etap, aby do niego przejść; przerywane ramki to kroki jeszcze przed Tobą.',
         stepsNav: 'Kroki',
         chatTitle: 'Czat wsparcia TechX',
         greeting: 'Dzień dobry! Opisz problem, a znajdę odpowiedź w instrukcjach.',
@@ -710,8 +738,9 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         flowIntro: { docs: 'Instrukcje produktów w zwykłym tekście.', embed: 'Zamienia każdy tekst na wektor: listę liczb, która zapisuje jego znaczenie.', db: 'Przechowuje wektory wszystkich dokumentów.', ask: 'Klient pyta w czacie.', qembed: 'Ten sam model zamienia pytanie na wektor.', search: 'Szuka wektorów najbardziej podobnych do wektora pytania.', prompt: 'Zasady + znalezione dokumenty + pytanie.', llm: 'Czyta prompt i pisze odpowiedź.', answer: 'Odpowiedź z linkami do źródeł.' },
         recapDocs: '{n} instrukcji produktów.',
         recapEmbed: 'Każdy dokument dostał {d} liczb.',
-        recapDb: '{n} wektorów gotowych do wyszukiwania.',
+        recapDb: '{n} dokumentów gotowych do wyszukiwania.',
         recapNoHits: 'Nic nie przekroczyło progu {min}.',
+        recapHit: 'Dokument_{id} {p}%',
         recapPrompt: 'Prompt systemowy + dokumenty: {n} + pytanie.',
         recapLlm: 'Przeczytał prompt i napisał odpowiedź z kontekstu.',
         recapNone: 'Brak danych w bazie, więc bez zgadywania.',
@@ -753,6 +782,8 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         langSwitch: 'Language', back: 'Previous step', next: 'Next', restart: 'Start over', docs: 'Documents', close: 'Close',
         backTip: 'Previous step (←)', nextTip: 'Next step (→)', restartTip: 'Start over (R)', docsTip: 'Documents (D)', langTip: 'Language (L)', sendTip: 'Send the question (Enter)', backShort: 'Back', nextTo: 'Next: {stage}', newQuestion: 'New question', newQuestionTip: 'Ask another question in the chat', askHint: 'Send the question in the chat or press “Next”.',
         replay: 'Replay', replayTip: 'Replay the animation (P)',
+        mapShort: 'Map', mapTip: 'RAG map: where you are (M)', mapTitle: 'RAG map', youAreHere: 'You are here', hereStage: 'You are here: {stage}',
+        mapHint: 'The marked stage is the step you are on. Click a reached stage to go to it; dashed boxes are steps still ahead.',
         stepsNav: 'Steps',
         chatTitle: 'TechX support chat',
         greeting: 'Hi! Describe the problem and I will find the answer in our manuals.',
@@ -782,8 +813,9 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         flowIntro: { docs: 'Product manuals in plain text.', embed: 'Turns each text into a vector: a list of numbers that captures its meaning.', db: 'Stores the vectors of all documents.', ask: 'The customer asks in the chat.', qembed: 'The same model turns the question into a vector.', search: 'Finds the vectors most similar to the question vector.', prompt: 'Rules + retrieved documents + question.', llm: 'Reads the prompt and writes the answer.', answer: 'An answer with links to its sources.' },
         recapDocs: '{n} product manuals.',
         recapEmbed: 'Each document got {d} numbers.',
-        recapDb: '{n} vectors ready for search.',
+        recapDb: '{n} documents ready for search.',
         recapNoHits: 'Nothing passed the {min} threshold.',
+        recapHit: 'Document_{id} {p}%',
         recapPrompt: 'System prompt + documents: {n} + question.',
         recapLlm: 'Read the prompt and wrote the answer from the context.',
         recapNone: 'No data in the knowledge base, so no guessing.',
@@ -861,6 +893,11 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     const drawer = $('drawer');
     const drawerBody = $('drawerBody');
     const drawerClose = $('drawerClose');
+    const mapButton = $('mapButton');
+    const mapDialog = $('mapDialog');
+    const mapBody = $('mapBody');
+    const mapHere = $('mapHere');
+    const mapClose = $('mapClose');
     const langButtons = [...document.querySelectorAll('.edu-seg button')];
 
     // ─── Helpers ───
@@ -1004,6 +1041,18 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       queryInput.select();
     }
 
+    function renderMap() {
+      mapHere.textContent = t('hereStage', { stage: stageTitle(state.view) });
+      mapBody.innerHTML = `<p class="talk">${esc(t('mapHint'))}</p>${flowDiagram('map')}`;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function openMap() {
+      if (drawer.open) drawer.close();
+      renderMap();
+      if (!mapDialog.open) mapDialog.showModal();
+    }
+
     function replayFlow() {
       const flow = $('flow');
       if (!flow) return;
@@ -1041,9 +1090,11 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       applyStaticText();
       render();
       if (drawer.open) renderDrawer();
+      if (mapDialog.open) renderMap();
     }
 
     function openDocs(docId = null) {
+      if (mapDialog.open) mapDialog.close();
       state.focusDoc = docId;
       renderDrawer();
       if (!drawer.open) drawer.showModal();
@@ -1098,9 +1149,9 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       return `<div class="vdb${animate ? ' embedding' : ''}" data-embedded="true">${head}<div class="vdb-grid${animate ? '' : ' reveal'}">${recs}</div>${foot}</div>`;
     }
 
-    // Flow page: generic on the intro, filled with this run's data on the recap
-    function flowDetail(key, recap) {
-      if (!recap) return esc(t('flowIntro')[key]);
+    // Flow: generic text until a stage is reached, then this run's data
+    function flowDetail(key, filled) {
+      if (!filled) return esc(t('flowIntro')[key]);
       const a = state.answer;
       switch (key) {
         case 'docs': return esc(t('recapDocs', { n: DOCS.length }));
@@ -1109,7 +1160,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         case 'ask': return esc(t('quoted', { q: state.query.trim() || t('emptyQuery') }));
         case 'qembed': return `[${esc(numbers(state.queryVector, 3))}]`;
         case 'search': return state.retrieved.length
-          ? state.retrieved.map(r => `${esc(t('docShort'))} ${r.id} · ${fmt2(r.similarity)}`).join('<br>')
+          ? state.retrieved.map(r => esc(t('recapHit', { id: r.id, p: Math.round(r.similarity * 100) }))).join('<br>')
           : esc(t('recapNoHits', { min: fmt2(MIN_SIMILARITY) }));
         case 'prompt': return esc(t('recapPrompt', { n: state.retrieved.length }));
         case 'llm': return esc(t('recapLlm'));
@@ -1120,25 +1171,31 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       return '';
     }
 
-    function flowDiagram(recap) {
+    // mode: 'intro' (generic, animated), 'recap' (this run, animated), 'map' (static, current stage marked)
+    function flowDiagram(mode) {
+      const isMap = mode === 'map';
+      const firstCurrent = FLOW_NODES.find(n => n.stage === state.view);
       const parts = [`<p class="lane" style="grid-area:1 / 1 / 2 / 6; --t:0">${esc(t('laneIndex'))}</p>`];
       FLOW_NODES.forEach((n, i) => {
         if (n.key === 'ask') parts.push(
           `<span class="flink vlink" style="grid-area:3 / 5; --t:${FLOW_NODES.find(x => x.key === 'search').t}" aria-hidden="true"><i></i></span>`,
           `<p class="lane" style="grid-area:3 / 1 / 4 / 4; --t:${n.t}">${esc(t('laneQuery'))}</p>`);
         else if (i) parts.push(`<span class="flink" style="grid-area:${n.row} / ${n.col - 1}; --t:${n.t}" aria-hidden="true"><i></i></span>`);
-        const inner = `<span class="fnode-h"><span class="badge ${n.tone}">${icon(n.icon)}</span><strong>${esc(t('flowNames')[n.key])}</strong></span><span class="fnode-d${recap && n.key === 'qembed' ? ' mono' : ''}">${flowDetail(n.key, recap)}</span>`;
-        const attrs = `class="fnode" style="grid-area:${n.row} / ${n.col}; --t:${n.t}" data-node="${n.key}"`;
-        parts.push(recap
-          ? `<button type="button" ${attrs} data-goto="${n.stage}">${inner}</button>`
+        const reached = mode !== 'intro' && n.stage <= lastView();
+        const current = isMap && n.stage === state.view;
+        const here = current && n === firstCurrent ? `<span class="edu-chip chip-yellow here">${esc(t('youAreHere'))}</span>` : '';
+        const inner = `${here}<span class="fnode-h"><span class="badge ${reached || mode === 'intro' ? n.tone : 'tone-off'}">${icon(n.icon)}</span><strong>${esc(t('flowNames')[n.key])}</strong></span><span class="fnode-d${reached && n.key === 'qembed' ? ' mono' : ''}">${flowDetail(n.key, reached)}</span>`;
+        const attrs = `class="fnode" style="grid-area:${n.row} / ${n.col}; --t:${n.t}" data-node="${n.key}"${isMap ? ` data-state="${reached ? 'done' : 'todo'}" data-current="${current}"` : ''}`;
+        parts.push(reached
+          ? `<button type="button" ${attrs} data-goto="${n.stage}"${current ? ' aria-current="step"' : ''}>${inner}</button>`
           : `<div ${attrs}>${inner}</div>`);
       });
-      return `<div class="flow play" id="flow" data-flow="${recap ? 'recap' : 'intro'}">${parts.join('')}</div>`;
+      return `<div class="flow${isMap ? '' : ' play'}" id="${isMap ? 'mapFlow' : 'flow'}" data-flow="${mode}">${parts.join('')}</div>`;
     }
 
     // ─── Render: stage bodies ───
     const STAGE_BODY = [
-      () => flowDiagram(false),
+      () => flowDiagram('intro'),
       animate => vectorDb({ highlight: false, animate }),
       () => `<p class="bubble"></p>`,
       () => `<div class="qvec reveal">${barcode(state.queryVector, 'code-lg')}<div class="num-grid" title="${esc(t('queryVec'))}">${state.queryVector.map((x, i) => `<span style="--i:${i}">${fmt2(x)}</span>`).join('')}</div></div>
@@ -1154,7 +1211,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
         return `<p class="answer-text" id="answerStageText"></p>
           <div class="answer-src"><p class="over-mono">${esc(t('sourcesTitle'))}</p>${a.docIds.map(docLink).join('')}</div>`;
       },
-      () => flowDiagram(true),
+      () => flowDiagram('recap'),
     ];
 
     // Text that comes from user input or long strings goes in with textContent
@@ -1285,6 +1342,13 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     resetButton.addEventListener('click', resetSimulation);
     docsButton.addEventListener('click', () => openDocs());
     drawerClose.addEventListener('click', () => drawer.close());
+    mapButton.addEventListener('click', openMap);
+    mapClose.addEventListener('click', () => mapDialog.close());
+    mapDialog.addEventListener('click', e => {
+      if (e.target === mapDialog) { mapDialog.close(); return; }
+      const btn = e.target.closest('[data-goto]');
+      if (btn) { mapDialog.close(); goTo(Number(btn.dataset.goto)); }
+    });
     drawer.addEventListener('click', e => { if (e.target === drawer) drawer.close(); });
     drawer.addEventListener('close', () => { state.focusDoc = null; });
     [stepperEl, stageCard].forEach(el => el.addEventListener('click', e => {
@@ -1300,7 +1364,8 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
     });
     langButtons.forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
     document.addEventListener('keydown', e => {
-      if (e.ctrlKey || e.metaKey || e.altKey || drawer.open && e.key.toLowerCase() !== 'd') return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (drawer.open && e.key.toLowerCase() !== 'd' || mapDialog.open && e.key.toLowerCase() !== 'm') return;
       if (e.target.closest('input, textarea, select, [contenteditable]')) return;
       const key = e.key.toLowerCase();
       if (key === 'arrowright' || key === 'n' || key === 'pagedown') { e.preventDefault(); forward(); }
@@ -1309,6 +1374,7 @@ body.edu { background: var(--paper); color: var(--ink); font-family: var(--font-
       else if (key === 'd') drawer.open ? drawer.close() : openDocs();
       else if (key === 'l') setLang(state.lang === 'pl' ? 'en' : 'pl');
       else if (key === 'p') replayFlow();
+      else if (key === 'm') mapDialog.open ? mapDialog.close() : openMap();
     });
 
     // ─── Init ───

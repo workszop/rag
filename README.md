@@ -17,5 +17,6 @@ Model osadzeń jest zabawkowy: ukryte tematy (słowa kluczowe PL/EN) są mieszan
 
 - Język: polski (domyślny) i angielski, przełącznik PL/EN w nagłówku, wybór zapamiętany w `localStorage`.
 - Krok po kroku: przycisk „Dalej: …” pod kartą kroku (lub `→`) przechodzi o jeden krok; „Wyślij” w czacie (`Enter`) tylko wysyła pytanie, dalsze kroki uruchamia użytkownik.
-- Skróty: `→` dalej, `←` wstecz, `P` odtwórz animację, `R` od nowa, `D` dokumenty, `L` język.
+- Przycisk „Schemat” w nagłówku (`M`) otwiera schemat całej drogi z zaznaczonym bieżącym krokiem („Tu jesteś”); osiągnięte etapy pokazują dane z bieżącego pytania i są klikalne.
+- Skróty: `→` dalej, `←` wstecz, `M` schemat, `P` odtwórz animację, `R` od nowa, `D` dokumenty, `L` język.
 - Styl: edulab (Editorial Color).
